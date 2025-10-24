@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prompt Library Viewer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <header class="sidebar__header">
+          <h1>Prompts</h1>
+          <input
+            type="search"
+            id="search-input"
+            class="sidebar__search"
+            placeholder="Search prompts"
+            autocomplete="off"
+          />
+        </header>
+        <nav id="category-list" class="sidebar__categories"></nav>
+      </aside>
+
+      <section class="prompt-list">
+        <header class="prompt-list__header">
+          <h2 id="prompt-list-title">All Prompts</h2>
+          <span id="prompt-count" class="prompt-list__count"></span>
+        </header>
+        <ul id="prompt-items" class="prompt-list__items"></ul>
+      </section>
+
+      <section class="editor">
+        <header class="editor__header">
+          <div>
+            <h2 id="editor-title">Select a prompt</h2>
+            <p id="editor-description" class="editor__description">
+              Choose a prompt from the list to view and edit its markdown file.
+            </p>
+          </div>
+          <button id="save-button" class="editor__save" disabled>Save</button>
+        </header>
+        <div id="editor-meta" class="editor__meta"></div>
+        <textarea
+          id="prompt-content"
+          class="editor__textarea"
+          placeholder="Prompt content will appear here"
+          spellcheck="false"
+          disabled
+        ></textarea>
+        <footer id="status-bar" class="status-bar">Ready.</footer>
+      </section>
+    </div>
+    <script src="app.js" defer></script>
+  </body>
+</html>

@@ -10,7 +10,7 @@
   },
   "transports": {
     "default": "stdio",
-    "sse": { "enabled": false },
+    "sse": { "enabled": true },
     "stdio": { "enabled": true }
   },
   "logging": {

@@ -4,14 +4,19 @@
  */
 
 import express, { Request, Response } from "express";
-import { mkdir, readFile, writeFile } from "fs/promises";
+import { mkdir, readFile, stat, writeFile } from "fs/promises";
 import path from "path";
 import { ConfigManager } from "../config/index.js";
 import { Logger } from "../logging/index.js";
 import { McpToolsManager } from "../mcp-tools/index.js";
 import { PromptManager } from "../prompts/index.js";
-import { modifyPromptSection } from "../prompts/promptUtils.js";
-import { Category, PromptData, PromptsFile } from "../types/index.js";
+import { modifyPromptSection, safeWriteFile } from "../prompts/promptUtils.js";
+import {
+  Category,
+  ConvertedPrompt,
+  PromptData,
+  PromptsFile,
+} from "../types/index.js";
 
 /**
  * API Manager class
@@ -23,7 +28,7 @@ export class ApiManager {
   private mcpToolsManager?: McpToolsManager;
   private promptsData: PromptData[] = [];
   private categories: Category[] = [];
-  private convertedPrompts: any[] = [];
+  private convertedPrompts: ConvertedPrompt[] = [];
 
   constructor(
     logger: Logger,
@@ -43,7 +48,7 @@ export class ApiManager {
   updateData(
     promptsData: PromptData[],
     categories: Category[],
-    convertedPrompts: any[]
+    convertedPrompts: ConvertedPrompt[]
   ): void {
     this.promptsData = promptsData;
     this.categories = categories;
@@ -124,6 +129,12 @@ export class ApiManager {
       const config = this.configManager.getConfig();
       res.json({ status: "ok", version: config.server.version });
     });
+
+    const viewerDir = this.getViewerDirectory();
+    app.use("/viewer", express.static(viewerDir));
+    this.logger.info(
+      `Prompt viewer assets served from ${viewerDir} (visit /viewer)`
+    );
   }
 
   /**
@@ -163,6 +174,91 @@ export class ApiManager {
         res.json(categoryPrompts);
       }
     );
+
+    // Get prompt detail including markdown content
+    app.get("/api/v1/prompts/:id", async (req: Request, res: Response) => {
+      try {
+        const promptId = req.params.id;
+        const promptInfo = this.findPromptById(promptId);
+
+        if (!promptInfo) {
+          return res
+            .status(404)
+            .json({ error: `Prompt with ID '${promptId}' not found` });
+        }
+
+        const fileContent = await readFile(promptInfo.filePath, "utf8");
+        const fileStats = await stat(promptInfo.filePath);
+
+        const converted = this.convertedPrompts.find(
+          (item) => item.id === promptId
+        );
+
+        res.json({
+          id: promptInfo.prompt.id,
+          name: promptInfo.prompt.name,
+          category: promptInfo.prompt.category,
+          description: promptInfo.prompt.description,
+          file: promptInfo.prompt.file,
+          arguments: promptInfo.prompt.arguments,
+          content: fileContent,
+          systemMessage: converted?.systemMessage,
+          userMessageTemplate: converted?.userMessageTemplate,
+          isChain: converted?.isChain ?? false,
+          chainSteps: converted?.chainSteps ?? [],
+          updatedAt: fileStats.mtime.toISOString(),
+        });
+      } catch (error) {
+        this.logger.error("Error handling get prompt detail request:", error);
+        res.status(500).json({
+          error: "Internal server error",
+          details: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
+
+    // Update prompt markdown content
+    app.put("/api/v1/prompts/:id", async (req: Request, res: Response) => {
+      try {
+        const promptId = req.params.id;
+        const { content } = req.body ?? {};
+
+        if (typeof content !== "string") {
+          return res.status(400).json({
+            error:
+              "Invalid request body. Expected a JSON object with a 'content' string.",
+          });
+        }
+
+        const promptInfo = this.findPromptById(promptId);
+        if (!promptInfo) {
+          return res
+            .status(404)
+            .json({ error: `Prompt with ID '${promptId}' not found` });
+        }
+
+        await safeWriteFile(promptInfo.filePath, content, "utf8");
+
+        // Refresh in-memory prompt data so MCP stays in sync
+        if (this.promptManager) {
+          await this.reloadPromptData();
+        }
+
+        const fileStats = await stat(promptInfo.filePath);
+
+        res.json({
+          success: true,
+          message: `Prompt '${promptId}' saved successfully`,
+          updatedAt: fileStats.mtime.toISOString(),
+        });
+      } catch (error) {
+        this.logger.error("Error saving prompt content:", error);
+        res.status(500).json({
+          error: "Internal server error",
+          details: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
   }
 
   /**
@@ -528,6 +624,39 @@ export class ApiManager {
         result.categories
       );
     }
+  }
+
+  /**
+   * Find prompt metadata and corresponding markdown file path
+   */
+  private findPromptById(
+    promptId: string
+  ): { prompt: PromptData; filePath: string } | null {
+    if (!this.promptsData || this.promptsData.length === 0) {
+      return null;
+    }
+
+    const prompt = this.promptsData.find((item) => item.id === promptId);
+    if (!prompt) {
+      return null;
+    }
+
+    const promptsConfigPath = this.getPromptsFilePath();
+    const configDir = path.dirname(promptsConfigPath);
+    const filePath = path.isAbsolute(prompt.file)
+      ? prompt.file
+      : path.join(configDir, prompt.file);
+
+    return { prompt, filePath };
+  }
+
+  /**
+   * Resolve absolute path to the static prompt viewer assets directory
+   */
+  private getViewerDirectory(): string {
+    const promptsConfigPath = this.getPromptsFilePath();
+    const baseDir = path.dirname(promptsConfigPath);
+    return path.resolve(baseDir, "public", "prompt-viewer");
   }
 
   /**
