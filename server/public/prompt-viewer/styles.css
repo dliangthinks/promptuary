@@ -56,40 +56,66 @@ body {
 .sidebar__categories {
   flex: 1;
   overflow-y: auto;
-}
-
-.sidebar__category {
-  margin-bottom: 12px;
-}
-
-.sidebar__category-title {
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin: 0 0 6px;
-}
-
-.sidebar__category-list {
-  list-style: none;
-  margin: 0;
   padding: 0;
 }
 
-.sidebar__prompt {
-  display: block;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: var(--text-primary);
-  text-decoration: none;
-  cursor: pointer;
+.sidebar__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.sidebar__prompt:hover,
-.sidebar__prompt--active {
+.sidebar__item {
+  margin: 0;
+}
+
+.sidebar__button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+  border-radius: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar__button:hover,
+.sidebar__button--active {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.sidebar__title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.sidebar__description {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sidebar__empty {
+  margin: 0;
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sidebar__actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .prompt-list {
@@ -105,9 +131,25 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.prompt-list__header h2 {
-  margin: 0;
+.prompt-list__title {
+  width: 100%;
   font-size: 18px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--text-primary);
+}
+
+.prompt-list__title:disabled {
+  color: var(--text-muted);
+}
+
+.prompt-list__title:focus {
+  outline: none;
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 4px 6px;
 }
 
 .prompt-list__count {
@@ -123,6 +165,14 @@ body {
   padding: 8px 0;
   flex: 1;
   overflow-y: auto;
+}
+
+.prompt-list__actions {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .prompt-list__item {
@@ -249,6 +299,31 @@ body {
 
 .status-bar--error {
   color: #b91c1c;
+}
+
+.action-button {
+  background: #eef2ff;
+  color: var(--accent);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.action-button:hover {
+  background: var(--accent-soft);
+}
+
+.action-button--danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.action-button--danger:hover {
+  background: #fecaca;
 }
 
 @media (max-width: 1100px) {

@@ -4,7 +4,7 @@
  */
 
 import express, { Request, Response } from "express";
-import { mkdir, readFile, stat, writeFile } from "fs/promises";
+import { mkdir, readFile, rm, stat } from "fs/promises";
 import path from "path";
 import { ConfigManager } from "../config/index.js";
 import { Logger } from "../logging/index.js";
@@ -15,7 +15,7 @@ import {
   Category,
   ConvertedPrompt,
   PromptData,
-  PromptsFile,
+  PromptsConfigFile,
 } from "../types/index.js";
 
 /**
@@ -142,18 +142,61 @@ export class ApiManager {
    */
   private setupPromptRoutes(app: express.Application): void {
     // Get all categories and prompts
-    app.get("/prompts", (_req: Request, res: Response) => {
-      const result = {
-        categories: this.categories,
-        prompts: this.promptsData.map((prompt) => ({
-          id: prompt.id,
-          name: prompt.name,
-          category: prompt.category,
-          description: prompt.description,
-          arguments: prompt.arguments,
-        })),
-      };
-      res.json(result);
+    app.get("/prompts", async (_req: Request, res: Response) => {
+      try {
+        const promptsWithMeta = await Promise.all(
+          this.promptsData.map(async (prompt) => {
+            const filePath = this.getPromptFilePath(prompt);
+            let updatedAt: string | null = null;
+
+            try {
+              const fileStats = await stat(filePath);
+              updatedAt = fileStats.mtime.toISOString();
+            } catch (error) {
+              this.logger.debug(
+                `Unable to read stats for prompt file ${filePath}:`,
+                error
+              );
+            }
+
+            return {
+              id: prompt.id,
+              name: prompt.name,
+              category: prompt.category,
+              description: prompt.description,
+              arguments: prompt.arguments,
+              file: prompt.file,
+              updatedAt,
+            };
+          })
+        );
+
+        res.json({
+          categories: this.categories,
+          prompts: promptsWithMeta,
+        });
+      } catch (error) {
+        this.logger.error("Error building prompts catalog:", error);
+        res.status(500).json({
+          error: "Failed to load prompt catalog",
+          details: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
+
+    // Create prompt
+    app.post("/api/v1/prompts", async (req: Request, res: Response) => {
+      await this.handleCreatePrompt(req, res);
+    });
+
+    // Delete prompt (REST alias)
+    app.delete("/api/v1/prompts/:id", async (req: Request, res: Response) => {
+      await this.handleDeletePrompt(req, res);
+    });
+
+    // Delete category
+    app.delete("/api/v1/categories/:id", async (req: Request, res: Response) => {
+      await this.handleDeleteCategory(req, res);
     });
 
     // Get prompts by category
@@ -172,6 +215,13 @@ export class ApiManager {
         }
 
         res.json(categoryPrompts);
+      }
+    );
+
+    app.patch(
+      "/api/v1/categories/:id",
+      async (req: Request, res: Response) => {
+        await this.handleUpdateCategory(req, res);
       }
     );
 
@@ -330,7 +380,9 @@ export class ApiManager {
       // Read the current prompts configuration file
       const PROMPTS_FILE = this.getPromptsFilePath();
       const fileContent = await readFile(PROMPTS_FILE, "utf8");
-      const promptsFile = JSON.parse(fileContent) as PromptsFile;
+      const promptsFile = JSON.parse(fileContent) as PromptsConfigFile & {
+        prompts?: PromptData[];
+      };
 
       // Check if the category already exists
       const categoryExists = promptsFile.categories.some(
@@ -344,24 +396,23 @@ export class ApiManager {
       // Add the new category
       promptsFile.categories.push({ id, name, description });
 
+      const importPath = `prompts/${id}/prompts.json`;
+      if (!Array.isArray(promptsFile.imports)) {
+        promptsFile.imports = [];
+      }
+      if (!promptsFile.imports.includes(importPath)) {
+        promptsFile.imports.push(importPath);
+      }
+
       // Write the updated file
-      await writeFile(
+      await safeWriteFile(
         PROMPTS_FILE,
         JSON.stringify(promptsFile, null, 2),
         "utf8"
       );
 
-      // Create the category directory if it doesn't exist
-      const categoryDirPath = path.join(process.cwd(), "prompts", id);
-      try {
-        await mkdir(categoryDirPath, { recursive: true });
-      } catch (error) {
-        this.logger.error(
-          `Error creating directory ${categoryDirPath}:`,
-          error
-        );
-        // Continue even if directory creation fails
-      }
+      // Ensure category directory and prompts file exist
+      await this.ensureCategoryPromptsFile(id);
 
       // Reload prompts and categories if prompt manager is available
       if (this.promptManager) {
@@ -437,6 +488,121 @@ export class ApiManager {
   }
 
   /**
+   * Handle create prompt API endpoint
+   */
+  private async handleCreatePrompt(req: Request, res: Response): Promise<void> {
+    try {
+      const {
+        id,
+        name,
+        category,
+        description = "",
+        content,
+        arguments: promptArgs,
+      } = req.body ?? {};
+
+      if (!id || !name || !category) {
+        res.status(400).json({
+          error:
+            "Missing required fields. Please provide id, name, and category.",
+        });
+        return;
+      }
+
+      if (this.promptsData.some((prompt) => prompt.id === id)) {
+        res
+          .status(409)
+          .json({ error: `Prompt with ID '${id}' already exists.` });
+        return;
+      }
+
+      const promptsJsonPath = await this.ensureCategoryPromptsFile(category);
+      const promptsFileContent = await readFile(promptsJsonPath, "utf8");
+      const promptsData = JSON.parse(promptsFileContent) as {
+        prompts?: PromptData[];
+      };
+
+      if (!Array.isArray(promptsData.prompts)) {
+        promptsData.prompts = [];
+      }
+
+      if (promptsData.prompts.some((prompt) => prompt.id === id)) {
+        res
+          .status(409)
+          .json({ error: `Prompt with ID '${id}' already exists.` });
+        return;
+      }
+
+      const sanitizedArgs = Array.isArray(promptArgs)
+        ? promptArgs
+            .map((arg: any) => ({
+              name: typeof arg?.name === "string" ? arg.name : "",
+              description:
+                typeof arg?.description === "string" ? arg.description : undefined,
+              required: Boolean(arg?.required),
+            }))
+            .filter((arg) => arg.name)
+        : [];
+
+      const markdownFilename = `${id}.md`;
+      const promptMetadata: PromptData = {
+        id,
+        name,
+        category,
+        description,
+        file: markdownFilename,
+        arguments: sanitizedArgs,
+      };
+
+      promptsData.prompts.push(promptMetadata);
+
+      await safeWriteFile(
+        promptsJsonPath,
+        JSON.stringify(promptsData, null, 2),
+        "utf8"
+      );
+
+      const markdownPath = path.join(
+        path.dirname(promptsJsonPath),
+        markdownFilename
+      );
+
+      const trimmedContent =
+        typeof content === "string" && content.trim().length > 0
+          ? content
+          : `# ${name}
+
+## Description
+${description || "Describe what this prompt should accomplish."}
+
+## System Message
+You are a helpful AI assistant. Update this system message with the right instructions for the prompt.
+
+## User Message Template
+Replace this section with the content you want to send to the assistant. Use {{placeholders}} for arguments.
+`;
+
+      await safeWriteFile(markdownPath, trimmedContent, "utf8");
+
+      if (this.promptManager) {
+        await this.reloadPromptData();
+      }
+
+      res.status(201).json({
+        success: true,
+        message: `Prompt '${name}' created successfully`,
+        prompt: promptMetadata,
+      });
+    } catch (error) {
+      this.logger.error("Error handling create prompt request:", error);
+      res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  /**
    * Handle delete prompt API endpoint
    */
   private async handleDeletePrompt(req: Request, res: Response): Promise<void> {
@@ -449,13 +615,208 @@ export class ApiManager {
         return;
       }
 
-      // Implementation would include full delete logic...
+      const promptInfo = this.findPromptById(id);
+      if (!promptInfo) {
+        res.status(404).json({ error: `Prompt '${id}' not found` });
+        return;
+      }
+
+      const promptsJsonPath = await this.ensureCategoryPromptsFile(
+        promptInfo.prompt.category
+      );
+
+      const promptsFileContent = await readFile(promptsJsonPath, "utf8");
+      const promptsData = JSON.parse(promptsFileContent) as {
+        prompts?: PromptData[];
+      };
+
+      if (!Array.isArray(promptsData.prompts)) {
+        promptsData.prompts = [];
+      }
+
+      const newPrompts = promptsData.prompts.filter(
+        (item) => item.id !== id
+      );
+
+      if (newPrompts.length === promptsData.prompts.length) {
+        res.status(404).json({ error: `Prompt '${id}' not found in registry` });
+        return;
+      }
+
+      promptsData.prompts = newPrompts;
+
+      await safeWriteFile(
+        promptsJsonPath,
+        JSON.stringify(promptsData, null, 2),
+        "utf8"
+      );
+
+      const markdownPath = this.getPromptFilePath(promptInfo.prompt);
+      try {
+        await rm(markdownPath, { force: true });
+      } catch (error) {
+        this.logger.warn(
+          `Failed to remove markdown file for prompt '${id}' at ${markdownPath}:`,
+          error
+        );
+      }
+
+      if (this.promptManager) {
+        await this.reloadPromptData();
+      }
+
       res.status(200).json({
         success: true,
         message: `Prompt '${id}' deleted successfully`,
       });
     } catch (error) {
       this.logger.error("Error handling delete_prompt API request:", error);
+      res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  /**
+   * Handle delete category endpoint
+   */
+  private async handleDeleteCategory(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const id = req.params.id;
+      if (!id) {
+        res.status(400).json({ error: "Category ID is required" });
+        return;
+      }
+
+      const PROMPTS_FILE = this.getPromptsFilePath();
+      const configContent = await readFile(PROMPTS_FILE, "utf8");
+      const promptsFile = JSON.parse(configContent) as PromptsConfigFile & {
+        prompts?: PromptData[];
+      };
+
+      const categoryIndex = promptsFile.categories.findIndex(
+        (cat) => cat.id === id
+      );
+
+      if (categoryIndex === -1) {
+        res.status(404).json({
+          error: `Category '${id}' not found`,
+        });
+        return;
+      }
+
+      const promptsRemoved = this.promptsData.filter(
+        (prompt) => prompt.category === id
+      ).length;
+
+      promptsFile.categories.splice(categoryIndex, 1);
+
+      if (Array.isArray(promptsFile.imports)) {
+        const importPath = `prompts/${id}/prompts.json`;
+        promptsFile.imports = promptsFile.imports.filter(
+          (item: string) => item !== importPath
+        );
+      }
+
+      if (Array.isArray(promptsFile.prompts)) {
+        promptsFile.prompts = promptsFile.prompts.filter(
+          (prompt) => prompt.category !== id
+        );
+      }
+
+      await safeWriteFile(
+        PROMPTS_FILE,
+        JSON.stringify(promptsFile, null, 2),
+        "utf8"
+      );
+
+      const configDir = path.dirname(PROMPTS_FILE);
+      const categoryDir = path.join(configDir, "prompts", id);
+      try {
+        await rm(categoryDir, { recursive: true, force: true });
+      } catch (error) {
+        this.logger.warn(
+          `Failed to remove directory for category '${id}':`,
+          error
+        );
+      }
+
+      if (this.promptManager) {
+        await this.reloadPromptData();
+      }
+
+      res.status(200).json({
+        success: true,
+        message: `Category '${id}' deleted successfully`,
+        removedPrompts: promptsRemoved,
+      });
+    } catch (error) {
+      this.logger.error("Error handling delete category request:", error);
+      res.status(500).json({
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  private async handleUpdateCategory(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const id = req.params.id;
+      const { name, description } = req.body ?? {};
+
+      if (!id) {
+        res.status(400).json({ error: "Category ID is required" });
+        return;
+      }
+
+      if (name === undefined && description === undefined) {
+        res.status(400).json({
+          error: "Provide a new name or description to update the category.",
+        });
+        return;
+      }
+
+      const PROMPTS_FILE = this.getPromptsFilePath();
+      const fileContent = await readFile(PROMPTS_FILE, "utf8");
+      const promptsFile = JSON.parse(fileContent) as PromptsConfigFile;
+
+      const category = promptsFile.categories.find((cat) => cat.id === id);
+      if (!category) {
+        res.status(404).json({ error: `Category '${id}' not found` });
+        return;
+      }
+
+      if (typeof name === "string" && name.trim().length > 0) {
+        category.name = name.trim();
+      }
+      if (typeof description === "string") {
+        category.description = description;
+      }
+
+      await safeWriteFile(
+        PROMPTS_FILE,
+        JSON.stringify(promptsFile, null, 2),
+         "utf8"
+      );
+
+      if (this.promptManager) {
+        await this.reloadPromptData();
+      }
+
+      res.status(200).json({
+        success: true,
+        message: `Category '${id}' updated`,
+        category,
+      });
+    } catch (error) {
+      this.logger.error("Error updating category:", error);
       res.status(500).json({
         error: "Internal server error",
         details: error instanceof Error ? error.message : String(error),
@@ -641,13 +1002,45 @@ export class ApiManager {
       return null;
     }
 
-    const promptsConfigPath = this.getPromptsFilePath();
-    const configDir = path.dirname(promptsConfigPath);
-    const filePath = path.isAbsolute(prompt.file)
-      ? prompt.file
-      : path.join(configDir, prompt.file);
+    const filePath = this.getPromptFilePath(prompt);
 
     return { prompt, filePath };
+  }
+
+  /**
+   * Resolve absolute prompt file path for the provided prompt metadata
+   */
+  private getPromptFilePath(prompt: PromptData): string {
+    const promptsConfigPath = this.getPromptsFilePath();
+    const configDir = path.dirname(promptsConfigPath);
+    return path.isAbsolute(prompt.file)
+      ? prompt.file
+      : path.join(configDir, prompt.file);
+  }
+
+  /**
+   * Ensure prompts directory and JSON file for a category exist
+   */
+  private async ensureCategoryPromptsFile(categoryId: string): Promise<string> {
+    const promptsConfigPath = this.getPromptsFilePath();
+    const configDir = path.dirname(promptsConfigPath);
+    const categoryDir = path.join(configDir, "prompts", categoryId);
+    await mkdir(categoryDir, { recursive: true });
+
+    const promptsJsonPath = path.join(categoryDir, "prompts.json");
+
+    try {
+      await stat(promptsJsonPath);
+    } catch {
+      const initialData = { prompts: [] };
+      await safeWriteFile(
+        promptsJsonPath,
+        JSON.stringify(initialData, null, 2),
+        "utf8"
+      );
+    }
+
+    return promptsJsonPath;
   }
 
   /**

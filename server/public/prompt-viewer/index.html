@@ -10,7 +10,7 @@
     <div class="app">
       <aside class="sidebar">
         <header class="sidebar__header">
-          <h1>Prompts</h1>
+          <h1>Prompts Categories</h1>
           <input
             type="search"
             id="search-input"
@@ -20,14 +20,36 @@
           />
         </header>
         <nav id="category-list" class="sidebar__categories"></nav>
+        <div class="sidebar__actions">
+          <button id="add-category-btn" class="action-button">
+            New Category
+          </button>
+          <button id="remove-category-btn" class="action-button action-button--danger">
+            Delete Category
+          </button>
+        </div>
       </aside>
 
       <section class="prompt-list">
         <header class="prompt-list__header">
-          <h2 id="prompt-list-title">All Prompts</h2>
+          <input
+            id="prompt-list-title"
+            class="prompt-list__title"
+            type="text"
+            value="Prompts"
+            aria-label="Category name"
+          />
           <span id="prompt-count" class="prompt-list__count"></span>
         </header>
         <ul id="prompt-items" class="prompt-list__items"></ul>
+        <div class="prompt-list__actions">
+          <button id="add-prompt-btn" class="action-button">
+            New Prompt
+          </button>
+          <button id="remove-prompt-btn" class="action-button action-button--danger">
+            Delete Prompt
+          </button>
+        </div>
       </section>
 
       <section class="editor">

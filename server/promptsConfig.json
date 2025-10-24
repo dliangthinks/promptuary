@@ -1,11 +1,6 @@
 {
   "categories": [
     {
-      "id": "general",
-      "name": "General",
-      "description": "General-purpose prompts for everyday tasks"
-    },
-    {
       "id": "code",
       "name": "Code",
       "description": "Prompts related to programming and software development"
@@ -26,53 +21,18 @@
       "description": "Prompts for software development and code quality"
     },
     {
-      "id": "research",
-      "name": "Research",
-      "description": "Prompts for conducting thorough investigations and analyses across various domains of knowledge."
-    },
-    {
       "id": "research-tools",
       "name": "Research Tools",
       "description": "Advanced prompts and chains for conducting comprehensive research and analysis"
     },
     {
-      "id": "testing",
-      "name": "Testing",
-      "description": "Prompts for testing purposes"
-    },
-    {
-      "id": "obsidian",
-      "name": "Obsidian",
-      "description": "Prompts related to Obsidian"
-    },
-    {
-      "id": "documentation",
-      "name": "Documentation",
-      "description": "Prompts related to Documentation"
-    },
-    {
-      "id": "examples",
-      "name": "Examples",
-      "description": "Example prompts demonstrating various features and techniques, including Nunjucks."
-    },
-    {
-      "id": "creative-tools",
-      "name": "Creative Tools",
-      "description": "Prompts related to Creative Tools"
-    },
-    {
-      "id": "creative",
-      "name": "Creative",
-      "description": "Prompts related to Creative"
-    },
-    {
       "id": "debugging",
-      "name": "debugging",
+      "name": "Debugging",
       "description": "Prompts related to debugging"
     },
     {
       "id": "content_processing",
-      "name": "content_processing",
+      "name": "Content Processing",
       "description": "Prompts related to content_processing"
     },
     {
@@ -82,7 +42,7 @@
     },
     {
       "id": "pm",
-      "name": "pm",
+      "name": "Project Management",
       "description": "Prompts related to pm"
     }
   ],
@@ -92,12 +52,7 @@
     "prompts/analysis/prompts.json",
     "prompts/education/prompts.json",
     "prompts/development/prompts.json",
-    "prompts/research/prompts.json",
     "prompts/research-tools/prompts.json",
-    "prompts/documentation/prompts.json",
-    "prompts/examples/prompts.json",
-    "prompts/creative-tools/prompts.json",
-    "prompts/creative/prompts.json",
     "prompts/debugging/prompts.json",
     "prompts/content_processing/prompts.json",
     "prompts/system/prompts.json",

@@ -23,11 +23,16 @@
     saveButton: document.getElementById("save-button"),
     statusBar: document.getElementById("status-bar"),
     searchInput: document.getElementById("search-input"),
+    addCategoryButton: document.getElementById("add-category-btn"),
+    removeCategoryButton: document.getElementById("remove-category-btn"),
+    addPromptButton: document.getElementById("add-prompt-btn"),
+    removePromptButton: document.getElementById("remove-prompt-btn"),
   };
 
   const routes = {
     catalog: "/prompts",
     promptDetail: (id) => `/api/v1/prompts/${encodeURIComponent(id)}`,
+    updateCategory: (id) => `/api/v1/categories/${encodeURIComponent(id)}`,
   };
 
   function setStatus(message, variant = "idle") {
@@ -40,8 +45,18 @@
     }
   }
 
+  function slugify(value) {
+    return (value || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
   function getCategoryName(categoryId) {
-    if (!categoryId) return "All prompts";
+    if (!categoryId) {
+      return state.categories.length ? state.categories[0].name : "No category";
+    }
     const category = state.categories.find((item) => item.id === categoryId);
     return category ? category.name : categoryId;
   }
@@ -49,8 +64,9 @@
   function applyFilters() {
     const trimmedSearch = state.searchTerm.trim().toLowerCase();
     state.filteredPrompts = state.prompts.filter((prompt) => {
-      const matchesCategory =
-        !state.activeCategory || prompt.category === state.activeCategory;
+      const matchesCategory = state.activeCategory
+        ? prompt.category === state.activeCategory
+        : false;
       const matchesSearch =
         !trimmedSearch ||
         prompt.searchText.includes(trimmedSearch) ||
@@ -59,62 +75,98 @@
     });
   }
 
+  function ensureActiveCategory() {
+    if (!state.categories.length) {
+      state.activeCategory = null;
+      return;
+    }
+
+    const exists = state.categories.some(
+      (category) => category.id === state.activeCategory
+    );
+
+    if (!exists) {
+      state.activeCategory = state.categories[0].id;
+    }
+  }
+
   function renderCategories() {
     const container = elements.categoryList;
     container.innerHTML = "";
+
+    if (!state.categories.length) {
+      const empty = document.createElement("p");
+      empty.className = "sidebar__empty";
+      empty.textContent = "No categories yet.";
+      container.appendChild(empty);
+      updateActionStates();
+      return;
+    }
 
     const counts = state.prompts.reduce((acc, prompt) => {
       acc[prompt.category] = (acc[prompt.category] || 0) + 1;
       return acc;
     }, {});
 
-    const allButton = document.createElement("button");
-    allButton.type = "button";
-    allButton.className =
-      "sidebar__prompt" +
-      (state.activeCategory === null ? " sidebar__prompt--active" : "");
-    allButton.textContent = `All Prompts (${state.prompts.length})`;
-    allButton.addEventListener("click", () => selectCategory(null));
-    container.appendChild(allButton);
+    const list = document.createElement("ul");
+    list.className = "sidebar__items";
 
     state.categories.forEach((category) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "sidebar__category";
-
-      const title = document.createElement("p");
-      title.className = "sidebar__category-title";
-      title.textContent = category.name;
-      wrapper.appendChild(title);
+      const item = document.createElement("li");
+      item.className = "sidebar__item";
 
       const button = document.createElement("button");
       button.type = "button";
       button.className =
-        "sidebar__prompt" +
+        "sidebar__button" +
         (state.activeCategory === category.id
-          ? " sidebar__prompt--active"
+          ? " sidebar__button--active"
           : "");
-      const count = counts[category.id] || 0;
-      button.textContent = count
-        ? `${category.name} (${count})`
-        : `${category.name}`;
+      button.title = category.description || category.name;
       button.addEventListener("click", () => selectCategory(category.id));
 
-      wrapper.appendChild(button);
-      container.appendChild(wrapper);
+      const title = document.createElement("span");
+      title.className = "sidebar__title";
+      title.textContent = category.name;
+
+      const detail = document.createElement("span");
+      detail.className = "sidebar__description";
+      const descriptionText = category.description?.trim()
+        ? category.description.trim()
+        : "No description provided.";
+      const count = counts[category.id] || 0;
+      const countLabel = count
+        ? ` • ${count} prompt${count === 1 ? "" : "s"}`
+        : "";
+      detail.textContent = `${descriptionText}${countLabel}`;
+
+      button.append(title, detail);
+      item.appendChild(button);
+      list.appendChild(item);
     });
+
+    container.appendChild(list);
+
+    updateActionStates();
   }
 
   function renderPromptList() {
     const list = elements.promptItems;
     list.innerHTML = "";
 
-    let title = "All Prompts";
+    if (!state.categories.length) {
+      elements.promptListTitle.value = "Prompts";
+      elements.promptListTitle.disabled = true;
+      elements.promptCount.textContent = "";
+      return;
+    }
+
+    let title = getCategoryName(state.activeCategory);
     if (state.searchTerm) {
       title = `Results for “${state.searchTerm}”`;
-    } else if (state.activeCategory) {
-      title = getCategoryName(state.activeCategory);
     }
-    elements.promptListTitle.textContent = title;
+    elements.promptListTitle.value = title;
+    elements.promptListTitle.disabled = Boolean(state.searchTerm);
 
     const count = state.filteredPrompts.length;
     elements.promptCount.textContent = count
@@ -158,6 +210,8 @@
       item.appendChild(button);
       list.appendChild(item);
     });
+
+    updateActionStates();
   }
 
   function resetEditor() {
@@ -171,6 +225,7 @@
     elements.contentField.value = "";
     elements.contentField.disabled = true;
     elements.saveButton.disabled = true;
+    updateActionStates();
   }
 
   function updateEditor(promptDetail) {
@@ -200,6 +255,7 @@
     elements.contentField.disabled = false;
     elements.contentField.value = promptDetail.content;
     elements.saveButton.disabled = true;
+    updateActionStates();
   }
 
   async function fetchJson(url, options) {
@@ -223,11 +279,36 @@
     try {
       setStatus("Loading prompts…", "busy");
       const data = await fetchJson(routes.catalog);
-      state.categories = data.categories || [];
-      state.prompts = (data.prompts || []).map((prompt) => ({
-        ...prompt,
-        searchText: `${prompt.name} ${prompt.description || ""}`.toLowerCase(),
-      }));
+      const promptsArray = data.prompts || [];
+      state.prompts = promptsArray.map((prompt) => {
+        const updatedAt = prompt.updatedAt || null;
+        const updatedAtValue = updatedAt ? Date.parse(updatedAt) : 0;
+        return {
+          ...prompt,
+          updatedAt,
+          updatedAtValue,
+          searchText: `${prompt.name} ${prompt.description || ""}`.toLowerCase(),
+        };
+      });
+
+      state.prompts.sort((a, b) => b.updatedAtValue - a.updatedAtValue);
+
+      const categoriesWithRecency = (data.categories || []).map((category) => {
+        const latestPrompt = state.prompts.find(
+          (prompt) => prompt.category === category.id
+        );
+        return {
+          ...category,
+          updatedAtValue: latestPrompt?.updatedAtValue ?? 0,
+        };
+      });
+
+      categoriesWithRecency.sort(
+        (a, b) => b.updatedAtValue - a.updatedAtValue
+      );
+
+      state.categories = categoriesWithRecency;
+      ensureActiveCategory();
       applyFilters();
       renderCategories();
       renderPromptList();
@@ -240,6 +321,206 @@
       setStatus(error.message || "Failed to load prompts.", "error");
     }
   }
+
+  async function createCategory() {
+    const name = prompt("New category name?");
+    if (!name) {
+      return;
+    }
+
+    const suggestedId = slugify(name);
+    let idInput = prompt("Category ID?", suggestedId) || suggestedId;
+    idInput = slugify(idInput);
+
+    if (!idInput) {
+      alert("A category ID is required.");
+      return;
+    }
+
+    const description = prompt("Category description?", "") || "";
+
+    try {
+      setStatus("Creating category…", "busy");
+      await fetchJson("/api/v1/tools/create_category", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: idInput, name, description }),
+      });
+
+      state.activeCategory = idInput;
+      state.activePromptId = null;
+      state.activePromptDetail = null;
+      state.isDirty = false;
+
+      await loadCatalog();
+      setStatus(`Category “${name}” created.`);
+    } catch (error) {
+      setStatus(error.message || "Failed to create category.", "error");
+    }
+  }
+
+  async function deleteCategory() {
+    const categoryId = state.activeCategory;
+    if (!categoryId) {
+      alert("Select a category to delete.");
+      return;
+    }
+
+    const categoryName = getCategoryName(categoryId);
+
+    if (!confirm(`Delete category “${categoryName}” and its prompts?`)) {
+      return;
+    }
+
+    try {
+      setStatus("Deleting category…", "busy");
+      await fetchJson(`/api/v1/categories/${encodeURIComponent(categoryId)}`, {
+        method: "DELETE",
+      });
+
+      state.activeCategory = null;
+      state.activePromptId = null;
+      state.activePromptDetail = null;
+      state.isDirty = false;
+
+      await loadCatalog();
+      resetEditor();
+      setStatus(`Category “${categoryName}” deleted.`);
+    } catch (error) {
+      setStatus(error.message || "Failed to delete category.", "error");
+    }
+  }
+
+  async function createPrompt() {
+    let categoryId = state.activeCategory;
+    if (!categoryId) {
+      categoryId = prompt("Category ID for the new prompt?") || "";
+      categoryId = slugify(categoryId);
+    }
+
+    if (!categoryId) {
+      alert("A category ID is required to create a prompt.");
+      return;
+    }
+
+    const categoryExists = state.categories.some(
+      (category) => category.id === categoryId
+    );
+
+    if (!categoryExists) {
+      alert(
+        `Category “${categoryId}” does not exist. Create the category before adding prompts.`
+      );
+      return;
+    }
+
+    const name = prompt("Prompt name?");
+    if (!name) {
+      return;
+    }
+
+    const suggestedId = slugify(name);
+    let promptId = prompt("Prompt ID?", suggestedId) || suggestedId;
+    promptId = slugify(promptId);
+
+    if (!promptId) {
+      alert("A prompt ID is required.");
+      return;
+    }
+
+    if (state.prompts.some((prompt) => prompt.id === promptId)) {
+      alert(`Prompt ID “${promptId}” already exists.`);
+      return;
+    }
+
+    const description = prompt("Prompt description?", "") || "";
+
+    const defaultContent = `# ${name}
+
+## Description
+${description || "Describe what this prompt should achieve."}
+
+## System Message
+You are a helpful AI assistant. Update this section with instructions for the assistant.
+
+## User Message Template
+Provide input variables using {{placeholders}}.
+`;
+
+    try {
+      setStatus("Creating prompt…", "busy");
+      await fetchJson("/api/v1/prompts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: promptId,
+          name,
+          category: categoryId,
+          description,
+          content: defaultContent,
+        }),
+      });
+
+      state.activeCategory = categoryId;
+      state.activePromptId = promptId;
+      state.activePromptDetail = null;
+      state.isDirty = false;
+
+      await loadCatalog();
+      await selectPrompt(promptId);
+      setStatus(`Prompt “${name}” created.`);
+    } catch (error) {
+      setStatus(error.message || "Failed to create prompt.", "error");
+    }
+  }
+
+  async function deletePrompt() {
+    const promptId = state.activePromptId;
+    if (!promptId) {
+      alert("Select a prompt to delete.");
+      return;
+    }
+
+    const promptName = state.activePromptDetail?.name || promptId;
+
+    if (!confirm(`Delete prompt “${promptName}”?`)) {
+      return;
+    }
+
+    try {
+      setStatus("Deleting prompt…", "busy");
+      await fetchJson(`/api/v1/prompts/${encodeURIComponent(promptId)}`, {
+        method: "DELETE",
+      });
+
+      state.activePromptId = null;
+      state.activePromptDetail = null;
+      state.isDirty = false;
+
+      await loadCatalog();
+      resetEditor();
+      setStatus(`Prompt “${promptName}” deleted.`);
+    } catch (error) {
+      setStatus(error.message || "Failed to delete prompt.", "error");
+    }
+  }
+
+  function updateActionStates() {
+    if (elements.removeCategoryButton) {
+      const hasActiveCategory = Boolean(state.activeCategory);
+      elements.removeCategoryButton.disabled =
+        !hasActiveCategory || !state.categories.length;
+    }
+
+    if (elements.addPromptButton) {
+      elements.addPromptButton.disabled = state.categories.length === 0;
+    }
+
+    if (elements.removePromptButton) {
+      elements.removePromptButton.disabled = !state.activePromptId;
+    }
+  }
+
 
   async function selectPrompt(promptId) {
     if (state.isDirty && !confirm("Discard unsaved changes?")) {
@@ -305,19 +586,28 @@
   }
 
   function selectCategory(categoryId) {
+    if (!categoryId) {
+      return;
+    }
     if (state.activeCategory === categoryId) {
       return;
     }
     state.activeCategory = categoryId;
+    state.activePromptId = null;
+    state.activePromptDetail = null;
+    state.isDirty = false;
     applyFilters();
     renderCategories();
     renderPromptList();
     resetEditor();
-    setStatus(
-      categoryId
-        ? `Viewing prompts in “${getCategoryName(categoryId)}”.`
-        : "Viewing all prompts."
-    );
+    setStatus(`Viewing prompts in “${getCategoryName(categoryId)}”.`);
+    if (!state.searchTerm.trim()) {
+      elements.promptListTitle.disabled = false;
+      requestAnimationFrame(() => {
+        elements.promptListTitle.focus();
+        elements.promptListTitle.select();
+      });
+    }
   }
 
   function handleSearchInput(event) {
@@ -339,6 +629,66 @@
   elements.contentField.addEventListener("input", handleContentInput);
   elements.searchInput.addEventListener("input", handleSearchInput);
 
+  if (elements.addCategoryButton) {
+    elements.addCategoryButton.addEventListener("click", createCategory);
+  }
+
+  if (elements.removeCategoryButton) {
+    elements.removeCategoryButton.addEventListener("click", deleteCategory);
+  }
+
+  if (elements.addPromptButton) {
+    elements.addPromptButton.addEventListener("click", createPrompt);
+  }
+
+  if (elements.removePromptButton) {
+    elements.removePromptButton.addEventListener("click", deletePrompt);
+  }
+
+  async function renameActiveCategory() {
+    if (elements.promptListTitle.disabled) {
+      return;
+    }
+
+    const activeCategory = state.categories.find(
+      (category) => category.id === state.activeCategory
+    );
+
+    if (!activeCategory) {
+      return;
+    }
+
+    const newName = elements.promptListTitle.value.trim();
+
+    if (!newName || newName === activeCategory.name) {
+      elements.promptListTitle.value = activeCategory.name;
+      return;
+    }
+
+    try {
+      setStatus("Renaming category…", "busy");
+      await fetchJson(routes.updateCategory(activeCategory.id), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName }),
+      });
+
+      await loadCatalog();
+      setStatus(`Category renamed to “${newName}”.`);
+    } catch (error) {
+      setStatus(error.message || "Failed to rename category.", "error");
+      elements.promptListTitle.value = activeCategory.name;
+    }
+  }
+
+  elements.promptListTitle.addEventListener("blur", renameActiveCategory);
+  elements.promptListTitle.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      elements.promptListTitle.blur();
+    }
+  });
+
   document.addEventListener("keydown", (event) => {
     if (
       (event.metaKey || event.ctrlKey) &&
@@ -350,5 +700,6 @@
     }
   });
 
+  updateActionStates();
   loadCatalog();
 })();

@@ -1,7 +1,7 @@
 # Project Discovery
 
 ## Description
-Structured project discovery that gathers project concept, stakeholders, sponsor, milestones, development approach, and project manager through conversational questioning
+Structured project discovery that gathers project concept, stakeholders, sponsor, milestones, development approach, and project manager through conversational questioning.
 
 ## System Message
 You are an expert project consultant conducting iterative discovery. Follow this structured approach:
