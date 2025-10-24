@@ -1,0 +1,34 @@
+{
+  "dxt_version": "0.1",
+  "name": "my-prompt-library",
+  "display_name": "My Prompt Library",
+  "version": "1.0.0",
+  "description": "Intelligent prompt management system",
+  "author": {
+    "name": "Dong Liang"  
+   },
+  "icon": "assets/icon.png",
+  "homepage": "https://dliangthinks.me",
+  
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/dist/index.js"
+      ],
+      "env": {
+         "MCP_PROMPTS_CONFIG_PATH": "${user_config.prompts_config_path}"
+	}
+    }
+  },
+    "user_config": {
+    "prompts_config_path": {
+      "type": "string",
+      "title": "Prompts config file",
+      "description": "Path to promptsConfig.json used by the server",
+      "required": true
+    }
+  }
+}

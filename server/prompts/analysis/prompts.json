@@ -1,0 +1,188 @@
+{
+  "prompts": [
+    {
+      "id": "progressive_research",
+      "name": "Progressive Research Assistant",
+      "category": "analysis",
+      "description": "A step-by-step research assistant that builds knowledge incrementally through iterative questions and analysis.",
+      "file": "progressive_research.md",
+      "arguments": [
+        {
+          "name": "notes",
+          "description": "The initial notes or information to research and expand on",
+          "required": false
+        },
+        {
+          "name": "information",
+          "description": "Additional context or information to guide the research",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "note_refinement",
+      "name": "Note Refinement",
+      "category": "analysis",
+      "description": "Refine existing notes by improving organization, flow, and clarity without adding or modifying the content.",
+      "file": "note_refinement.md",
+      "arguments": [],
+      "onEmptyInvocation": "return_template"
+    },
+    {
+      "id": "note_integration",
+      "name": "Note Integration",
+      "category": "analysis",
+      "description": "Integrate new information from a markdown page into existing notes, merging them smoothly while maintaining a logical structure and avoiding duplication.",
+      "file": "note_integration.md",
+      "arguments": [
+        {
+          "name": "notes",
+          "description": "The existing notes",
+          "required": false
+        },
+        {
+          "name": "new_information",
+          "description": "The new information to be integrated",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "query_refinement",
+      "name": "Query Refinement",
+      "category": "analysis",
+      "description": "A systematic process to analyze and refine ambiguous coding requests into clear, actionable specifications.",
+      "file": "query_refinement.md",
+      "arguments": [
+        {
+          "name": "query",
+          "description": "The original user query to refine",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "test_analyzer",
+      "name": "Test Analyzer",
+      "category": "analysis",
+      "description": "A test prompt for content analysis with configurable depth",
+      "file": "test_analyzer.md",
+      "arguments": [
+        {
+          "name": "content",
+          "description": "The content to be analyzed",
+          "required": true
+        },
+        {
+          "name": "depth",
+          "description": "The depth of analysis (basic, detailed, or comprehensive)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "advanced_analysis_engine",
+      "name": "Advanced Analysis Engine",
+      "category": "analysis",
+      "description": "Complex template testing prompt with advanced Nunjucks features including conditionals, loops, inheritance, filters, and multi-format output generation. Designed to stress-test the template engine with maximum complexity.",
+      "file": "advanced_analysis_engine.md",
+      "arguments": [
+        {
+          "name": "topic",
+          "description": "Main topic or subject for analysis",
+          "required": true
+        },
+        {
+          "name": "analysis_type",
+          "description": "Type of analysis: market, technical, competitive, trend, risk, opportunity",
+          "required": false
+        },
+        {
+          "name": "sources",
+          "description": "Array of data sources: web, papers, news, social, industry, expert",
+          "required": false
+        },
+        {
+          "name": "depth",
+          "description": "Analysis depth: surface, standard, comprehensive, expert",
+          "required": false
+        },
+        {
+          "name": "format",
+          "description": "Output format: executive_summary, technical_report, presentation, research_paper",
+          "required": false
+        },
+        {
+          "name": "focus_areas",
+          "description": "Array of focus areas: technical, business, ethical, regulatory, social, environmental",
+          "required": false
+        },
+        {
+          "name": "constraints",
+          "description": "Object with constraints like time_limit, budget, scope, audience",
+          "required": false
+        },
+        {
+          "name": "requirements",
+          "description": "Array of specific requirements or objects with category, description, priority, examples",
+          "required": false
+        },
+        {
+          "name": "previous_context",
+          "description": "Previous analysis context to build upon",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "notes",
+      "name": "Notes",
+      "category": "analysis",
+      "description": "A comprehensive analysis chain that processes content through multiple stages: initial content analysis, deep analysis, conversion to a structured markdown notebook, and final refinement.",
+      "file": "notes.md",
+      "arguments": [
+        {
+          "name": "content",
+          "description": "The content to be processed through the analysis chain",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "content_analysis",
+      "name": "Content Analysis",
+      "category": "analysis",
+      "description": "Systematically analyze web content, breaking it down into key components.",
+      "file": "content_analysis.md",
+      "arguments": [
+        {
+          "name": "content",
+          "description": "The content to be analyzed",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "deep_analysis",
+      "name": "Deep Analysis",
+      "category": "analysis",
+      "description": "Expand on a previous analysis by diving deeper into information, identifying key insights and relationships.",
+      "file": "deep_analysis.md",
+      "arguments": []
+    },
+    {
+      "id": "intelligent_test",
+      "name": "Intelligent Analysis Test",
+      "category": "analysis",
+      "description": "Test prompt for intelligent semantic analysis without execution headers - should auto-detect as workflow",
+      "file": "intelligent_test.md",
+      "arguments": [
+        {
+          "name": "data",
+          "description": "The information or content to be analyzed",
+          "required": true
+        }
+      ]
+    }
+  ]
+}
