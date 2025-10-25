@@ -1,7 +1,7 @@
 {
   "dxt_version": "0.1",
-  "name": "my-prompt-library",
-  "display_name": "My Prompt Library",
+  "name": "promptuary",
+  "display_name": "Promptuary",
   "version": "1.0.0",
   "description": "Intelligent prompt management system",
   "author": {
@@ -17,18 +17,7 @@
       "command": "node",
       "args": [
         "${__dirname}/server/dist/index.js"
-      ],
-      "env": {
-         "MCP_PROMPTS_CONFIG_PATH": "${user_config.prompts_config_path}"
-	}
-    }
-  },
-    "user_config": {
-    "prompts_config_path": {
-      "type": "string",
-      "title": "Prompts config file",
-      "description": "Path to promptsConfig.json used by the server",
-      "required": true
+      ]
     }
   }
 }

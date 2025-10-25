@@ -1,5 +1,5 @@
 /**
- * MCP Claude Prompts Server - Main Entry Point
+ * Promptuary - Main Entry Point
  * Minimal entry point with comprehensive error handling, health checks, and validation
  */
 
@@ -292,7 +292,7 @@ async function gracefulShutdown(exitCode: number = 0): Promise<void> {
  */
 function showHelp(): void {
   console.log(`
-MCP Claude Prompts Server v1.1.0 - Enhanced Execution & Gate Validation
+Promptuary v1.1.0 - Enhanced Execution & Gate Validation
 
 USAGE:
   node dist/index.js [OPTIONS]
@@ -339,7 +339,7 @@ TROUBLESHOOTING:
   Set MCP_SERVER_ROOT environment variable for instant path detection
   Use --quiet in production for clean startup logs
 
-For more information, visit: https://github.com/minipuft/claude-prompts-mcp
+For more information, visit: https://github.com/dliangthinks/promptuary
 `);
 }
 
@@ -397,7 +397,7 @@ async function main(): Promise<void> {
     setupErrorHandlers();
 
     // Use stderr for startup message to avoid interfering with stdio transport
-    console.error("Starting MCP Claude Prompts Server...");
+    console.error("Starting Promptuary...");
 
     // Initialize the application using the orchestrator
     orchestrator = await startApplication();
@@ -416,7 +416,7 @@ async function main(): Promise<void> {
 
     // Log successful startup with details
     if (logger) {
-      logger.info("🚀 MCP Claude Prompts Server started successfully");
+      logger.info("🚀 Promptuary started successfully");
 
       // Log comprehensive application status
       const status = orchestrator.getStatus();
@@ -441,7 +441,7 @@ async function main(): Promise<void> {
     }
   } catch (error) {
     // Comprehensive error handling with rollback
-    console.error("❌ Failed to start MCP Claude Prompts Server:", error);
+    console.error("❌ Failed to start Promptuary:", error);
 
     if (logger) {
       logger.error("Fatal startup error:", error);

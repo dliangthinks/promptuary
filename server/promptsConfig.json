@@ -36,11 +36,6 @@
       "description": "Prompts related to content_processing"
     },
     {
-      "id": "system",
-      "name": "System",
-      "description": "Prompts related to System"
-    },
-    {
       "id": "pm",
       "name": "Project Management",
       "description": "Prompts related to pm"
@@ -55,7 +50,6 @@
     "prompts/research-tools/prompts.json",
     "prompts/debugging/prompts.json",
     "prompts/content_processing/prompts.json",
-    "prompts/system/prompts.json",
     "prompts/pm/prompts.json"
   ]
 }

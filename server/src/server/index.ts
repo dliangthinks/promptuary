@@ -66,8 +66,23 @@ export class ServerManager {
    * Start server with STDIO transport
    */
   private async startStdioServer(): Promise<void> {
-    // For STDIO, we don't need an HTTP server
-    await this.transportManager.setupStdioTransport();
+    // Start the viewer HTTP server first so it is available even if STDIO setup blocks
+    const viewerConfig = this.configManager.getViewerConfig();
+
+    if (!this.apiManager) {
+      this.logger.warn(
+        "API Manager not available - viewer HTTP server will not be started"
+      );
+    } else if (viewerConfig?.autoStart) {
+      await this.startViewerServer();
+    } else {
+      this.logger.debug(
+        "Viewer auto-start disabled. HTTP viewer server will not be started."
+      );
+    }
+
+    // Trigger STDIO transport setup without awaiting to prevent blocking the viewer startup
+    void this.transportManager.setupStdioTransport();
   }
 
   /**
@@ -94,7 +109,7 @@ export class ServerManager {
     await new Promise<void>((resolve, reject) => {
       this.httpServer!.listen(this.port, () => {
         this.logger.info(
-          `MCP Prompts Server running on http://localhost:${this.port}`
+          `Promptuary running on http://localhost:${this.port}`
         );
         this.logger.info(
           `Connect to http://localhost:${this.port}/mcp for MCP connections`
@@ -109,6 +124,47 @@ export class ServerManager {
           );
         } else {
           this.logger.error("Server error:", error);
+        }
+        reject(error);
+      });
+    });
+  }
+
+  /**
+   * Start HTTP server for viewer while running STDIO transport
+   */
+  private async startViewerServer(): Promise<void> {
+    if (!this.apiManager) {
+      throw new Error("API Manager is required for viewer server");
+    }
+
+    if (this.httpServer) {
+      this.logger.debug("Viewer server already running - skipping");
+      return;
+    }
+
+    const app = this.apiManager.createApp();
+    this.httpServer = createServer(app);
+    this.setupHttpServerEventHandlers();
+
+    await new Promise<void>((resolve, reject) => {
+      this.httpServer!.listen(this.port, () => {
+        this.logger.info(
+          `Promptuary viewer available at http://localhost:${this.port}/viewer`
+        );
+        this.logger.info(
+          `REST API available at http://localhost:${this.port}/prompts`
+        );
+        resolve();
+      });
+
+      this.httpServer!.on("error", (error: any) => {
+        if (error.code === "EADDRINUSE") {
+          this.logger.error(
+            `Port ${this.port} is already in use. Unable to start viewer HTTP server.`
+          );
+        } else {
+          this.logger.error("Viewer server error:", error);
         }
         reject(error);
       });

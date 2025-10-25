@@ -291,14 +291,14 @@ TROUBLESHOOTING CLAUDE DESKTOP ISSUES:
 
 🎯 RECOMMENDED SOLUTION (fastest):
    Set MCP_SERVER_ROOT environment variable:
-   Windows: set MCP_SERVER_ROOT=E:\\path\\to\\claude-prompts-mcp\\server
-   macOS/Linux: export MCP_SERVER_ROOT=/path/to/claude-prompts-mcp/server
+   Windows: set MCP_SERVER_ROOT=E:\\path\\to\\promptuary\\server
+   macOS/Linux: export MCP_SERVER_ROOT=/path/to/promptuary/server
 
 📁 Claude Desktop Configuration:
    Update your claude_desktop_config.json:
    {
      "mcpServers": {
-       "claude-prompts-mcp": {
+       "promptuary": {
          "command": "node",
          "args": ["E:\\\\full\\\\path\\\\to\\\\server\\\\dist\\\\index.js", "--transport=stdio"],
          "env": {
@@ -360,7 +360,7 @@ ${attemptedPaths}
 
     // Only show startup messages if not in quiet mode
     if (!isQuiet) {
-      this.logger.info("Starting MCP Claude Prompts Server...");
+      this.logger.info("Starting Promptuary...");
       this.logger.info(`Transport: ${transport}`);
     }
 
@@ -671,8 +671,11 @@ ${attemptedPaths}
       transport
     );
 
-    // Create API manager for SSE transport
-    if (this.transportManager.isSse()) {
+    const viewerConfig = this.configManager.getViewerConfig();
+    const needsApiManager =
+      this.transportManager.isSse() || viewerConfig?.autoStart;
+
+    if (needsApiManager) {
       this.apiManager = createApiManager(
         this.logger,
         this.configManager,

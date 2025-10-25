@@ -1,8 +1,8 @@
 # Version History
 
-## Claude Prompts MCP Server Version History
+## Promptuary Version History
 
-This document tracks the evolution of the Claude Prompts MCP Server, documenting major releases, features, improvements, and breaking changes.
+This document tracks the evolution of the Promptuary, documenting major releases, features, improvements, and breaking changes.
 
 ---
 

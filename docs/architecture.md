@@ -1,6 +1,6 @@
 # Architecture Overview
 
-This document provides a high-level overview of the Claude Prompts MCP Server, explaining its component-based architecture and how different modules collaborate to deliver a robust and extensible system.
+This document provides a high-level overview of the Promptuary, explaining its component-based architecture and how different modules collaborate to deliver a robust and extensible system.
 
 ## Core Principles
 
@@ -22,7 +22,7 @@ graph TB
         A[Claude Desktop / MCP Client]
     end
 
-    subgraph "Claude Prompts MCP Server"
+    subgraph "Promptuary"
         A -->|MCP Protocol via STDIO/SSE| B[Transport Layer]
         B --> C[🧠 Orchestration Engine]
 

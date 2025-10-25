@@ -1,10 +1,10 @@
-# Claude Prompts MCP Server
+# Promptuary
 
 <div align="center">
 
-![Claude Prompts MCP Server Logo](assets/logo.png)
+![Promptuary Logo](assets/logo.png)
 
-[![npm version](https://img.shields.io/npm/v/claude-prompts-server.svg?style=for-the-badge&logo=npm&color=0066cc)](https://www.npmjs.com/package/claude-prompts-server)
+[![npm version](https://img.shields.io/npm/v/promptuary.svg?style=for-the-badge&logo=npm&color=0066cc)](https://www.npmjs.com/package/promptuary)
 [![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge&logo=opensource)](https://opensource.org/licenses/MIT)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Compatible-ff6b35?style=for-the-badge&logo=anthropic)](https://modelcontextprotocol.io)
 [![Node.js](https://img.shields.io/badge/Node.js-16%2B-339933?style=for-the-badge&logo=node.js)](https://nodejs.org)
@@ -124,8 +124,8 @@ Get your AI command center running in **under a minute**:
 
 ```bash
 # Clone → Install → Launch → Profit! 🚀
-git clone https://github.com/minipuft/claude-prompts-mcp.git
-cd claude-prompts-mcp/server && npm install && npm run build && npm start
+git clone https://github.com/dliangthinks/promptuary.git
+cd promptuary/server && npm install && npm run build && npm start
 ```
 
 ### 🔌 **Universal MCP Client Integration**
@@ -137,24 +137,22 @@ Drop this into your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "claude-prompts-mcp": {
+    "promptuary": {
       "command": "node",
-      "args": ["E:\\path\\to\\claude-prompts-mcp\\server\\dist\\index.js"],
-      "env": {
-        "MCP_PROMPTS_CONFIG_PATH": "E:\\path\\to\\claude-prompts-mcp\\server\\promptsConfig.json"
-      }
+      "args": ["E:\\path\\to\\promptuary\\server\\dist\\index.js"]
     }
   }
 }
 ```
+
+> ✅ Once the extension starts, Promptuary automatically serves the viewer at `http://localhost:9090/viewer` so you can inspect and edit prompts without running additional commands.
 
 #### **Cursor Windsurf & Other MCP Clients**
 
 Configure your MCP client to connect via STDIO transport:
 
 - **Command**: `node`
-- **Args**: `["path/to/claude-prompts-mcp/server/dist/index.js"]`
-- **Environment**: `MCP_PROMPTS_CONFIG_PATH=path/to/promptsConfig.json`
+- **Args**: `["path/to/promptuary/server/dist/index.js"]`
 
 > 💡 **Pro Tip**: Use absolute paths for bulletproof integration across all MCP clients!
 
@@ -359,7 +357,7 @@ Fine-tune your server's behavior:
 ```json
 {
   "server": {
-    "name": "Claude Custom Prompts MCP Server",
+    "name": "Promptuary MCP Server",
     "version": "1.0.0",
     "port": 9090
   },
@@ -549,8 +547,8 @@ Built-in monitoring and diagnostics for production environments:
 
 We're building the future of AI prompt engineering! Join our community:
 
-- 🐛 **Found a bug?** [Open an issue](https://github.com/minipuft/claude-prompts-mcp/issues)
-- 💡 **Have an idea?** [Start a discussion](https://github.com/minipuft/claude-prompts-mcp/discussions)
+- 🐛 **Found a bug?** [Open an issue](https://github.com/dliangthinks/promptuary/issues)
+- 💡 **Have an idea?** [Start a discussion](https://github.com/dliangthinks/promptuary/discussions)
 - 🔧 **Want to contribute?** Check our [Contributing Guide](docs/contributing.md)
 - 📖 **Need help?** Visit our [Documentation](docs/README.md)
 
@@ -564,7 +562,7 @@ Released under the [MIT License](LICENSE) - see the file for details.
 
 **⭐ Star this repo if it's transforming your AI workflow!**
 
-[Report Bug](https://github.com/minipuft/claude-prompts-mcp/issues) • [Request Feature](https://github.com/minipuft/claude-prompts-mcp/issues) • [View Docs](docs/README.md)
+[Report Bug](https://github.com/dliangthinks/promptuary/issues) • [Request Feature](https://github.com/dliangthinks/promptuary/issues) • [View Docs](docs/README.md)
 
 _Built with ❤️ for the AI development community_
 

@@ -1,6 +1,6 @@
 # Chain Execution Guide (v1.1.0)
 
-This document provides a detailed explanation of how prompt chains work in the Claude Custom Prompts server, including the new enhanced execution features and gate validation system introduced in v1.1.0.
+This document provides a detailed explanation of how prompt chains work in the Promptuary server, including the new enhanced execution features and gate validation system introduced in v1.1.0.
 
 ## What are Prompt Chains?
 

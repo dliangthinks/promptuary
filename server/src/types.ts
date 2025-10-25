@@ -76,6 +76,16 @@ export interface Config {
   prompts: PromptsConfig;
   /** Transports configuration */
   transports: TransportsConfig;
+  /** Viewer configuration */
+  viewer?: ViewerConfig;
+}
+
+/**
+ * Viewer / HTTP configuration
+ */
+export interface ViewerConfig {
+  /** Automatically start HTTP viewer server when running in STDIO mode */
+  autoStart?: boolean;
 }
 
 // ===== Prompt Types =====

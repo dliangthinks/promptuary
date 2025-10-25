@@ -1,8 +1,8 @@
 {
-  "name": "claude-prompts-server",
+  "name": "promptuary",
   "version": "1.1.0",
-  "description": "Claude Custom Prompts MCP Server",
-  "author": "minipuft",
+  "description": "Promptuary MCP Server",
+  "author": "Dong Liang",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
@@ -27,14 +27,7 @@
     "test": "node test-server.js",
     "prepublishOnly": "npm run build"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/minipuft/claude-prompts.git"
-  },
-  "bugs": {
-    "url": "https://github.com/minipuft/claude-prompts/issues"
-  },
-  "homepage": "https://github.com/minipuft/claude-prompts#readme",
+  "homepage": "https://dliangthinks.me",
   "keywords": [
     "claude",
     "ai",

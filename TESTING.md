@@ -1,6 +1,6 @@
-# Testing Guide for Claude Custom Prompts
+# Testing Guide for Promptuary
 
-This guide will help you test the Claude Custom Prompts application, including both the server and the admin UI.
+This guide will help you test the Promptuary application, including both the server and the admin UI.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ This guide will help you test the Claude Custom Prompts application, including b
 1. Clone the repository (if you haven't already):
    ```bash
    git clone <repository-url>
-   cd claude-prompts
+   cd promptuary
    ```
 
 2. Install dependencies for both the server and admin UI:

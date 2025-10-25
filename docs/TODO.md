@@ -1,6 +1,6 @@
 # Roadmap & TODO
 
-This document outlines planned features, improvements, and enhancements for the Claude Prompts MCP Server. Items are organized by priority and development phases.
+This document outlines planned features, improvements, and enhancements for the Promptuary. Items are organized by priority and development phases.
 
 ## 🎯 High Priority Features
 
@@ -84,7 +84,7 @@ Streamline the setup process and consolidate configuration files.
 
 **Installation Improvements**:
 
-- **One-Command Setup**: `npx claude-prompts-mcp@latest setup`
+- **One-Command Setup**: `npx promptuary@latest setup`
 - **Interactive CLI Installer**: Guided setup with environment detection
 - **Docker Container**: Pre-configured container with all dependencies
 - **Auto-Detection**: Automatically find and configure Claude Desktop
@@ -301,8 +301,8 @@ Advanced security features for enterprise deployments.
 
 We welcome community input on this roadmap! Here's how you can contribute:
 
-- **Feature Requests**: [Open an issue](https://github.com/minipuft/claude-prompts-mcp/issues) with the `enhancement` label
-- **Discussion**: Join conversations in [GitHub Discussions](https://github.com/minipuft/claude-prompts-mcp/discussions)
+- **Feature Requests**: [Open an issue](https://github.com/dliangthinks/promptuary/issues) with the `enhancement` label
+- **Discussion**: Join conversations in [GitHub Discussions](https://github.com/dliangthinks/promptuary/discussions)
 - **Implementation**: Pick up items from this TODO and submit PRs
 - **Feedback**: Share your thoughts on priorities and implementation approaches
 

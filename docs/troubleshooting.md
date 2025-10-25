@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This guide helps you diagnose and fix common issues with the Claude Prompts MCP Server.
+This guide helps you diagnose and fix common issues with the Promptuary.
 
 ## 🚨 Quick Fixes for Common Issues
 
@@ -18,12 +18,12 @@ This guide helps you diagnose and fix common issues with the Claude Prompts MCP 
 
    ```bash
    # Windows
-   set MCP_SERVER_ROOT=E:\path\to\claude-prompts-mcp\server
-   set MCP_PROMPTS_CONFIG_PATH=E:\path\to\claude-prompts-mcp\server\promptsConfig.json
+   set MCP_SERVER_ROOT=E:\path\to\promptuary\server
+   set MCP_PROMPTS_CONFIG_PATH=E:\path\to\promptuary\server\promptsConfig.json
 
    # macOS/Linux
-   export MCP_SERVER_ROOT=/path/to/claude-prompts-mcp/server
-   export MCP_PROMPTS_CONFIG_PATH=/path/to/claude-prompts-mcp/server/promptsConfig.json
+   export MCP_SERVER_ROOT=/path/to/promptuary/server
+   export MCP_PROMPTS_CONFIG_PATH=/path/to/promptuary/server/promptsConfig.json
    ```
 
 2. **Use Absolute Paths in Claude Desktop Config**
@@ -31,7 +31,7 @@ This guide helps you diagnose and fix common issues with the Claude Prompts MCP 
    ```json
    {
      "mcpServers": {
-       "claude-prompts-mcp": {
+       "promptuary": {
          "command": "node",
          "args": ["E:\\full\\path\\to\\server\\dist\\index.js"],
          "env": {
@@ -45,7 +45,7 @@ This guide helps you diagnose and fix common issues with the Claude Prompts MCP 
 
 3. **Check Working Directory**
    ```bash
-   cd claude-prompts-mcp/server
+   cd promptuary/server
    npm start
    ```
 
@@ -409,7 +409,7 @@ find prompts -name "prompts.json" -exec echo "=== {} ===" \; -exec cat {} \;
 // Share your claude_desktop_config.json (remove paths if needed)
 {
   "mcpServers": {
-    "claude-prompts-mcp": {
+    "promptuary": {
       // Your configuration here
     }
   }
@@ -452,7 +452,7 @@ export MCP_PROMPTS_CONFIG_PATH="/full/path/to/server/promptsConfig.json"
 
 If you're still experiencing issues:
 
-1. **Search Existing Issues**: Check [GitHub Issues](https://github.com/minipuft/claude-prompts-mcp/issues)
+1. **Search Existing Issues**: Check [GitHub Issues](https://github.com/dliangthinks/promptuary/issues)
 
 2. **Create Detailed Bug Report**:
 
@@ -461,7 +461,7 @@ If you're still experiencing issues:
    - Provide reproduction steps
    - Include system information
 
-3. **Join Community Discussions**: [GitHub Discussions](https://github.com/minipuft/claude-prompts-mcp/discussions)
+3. **Join Community Discussions**: [GitHub Discussions](https://github.com/dliangthinks/promptuary/discussions)
 
 4. **Emergency Debugging**: Use `--verbose --debug-startup` flags for maximum diagnostic output
 

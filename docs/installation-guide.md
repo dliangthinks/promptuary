@@ -1,6 +1,6 @@
 # Installation and Setup Guide
 
-This guide will walk you through the process of installing and setting up the Claude Custom Prompts server and admin UI.
+This guide will walk you through the process of installing and setting up the Promptuary server and admin UI.
 
 ## Prerequisites
 
@@ -23,8 +23,8 @@ Before you begin, ensure you have the following installed:
 If you have Git installed, you can clone the repository:
 
 ```bash
-git clone https://github.com/minipuft/claude-prompts.git
-cd claude-prompts
+git clone https://github.com/dliangthinks/promptuary.git
+cd promptuary
 ```
 
 ### Option 2: Download the Source Code
@@ -54,7 +54,7 @@ The server configuration is stored in `server/config.json`. You can modify this 
 ```json
 {
   "server": {
-    "name": "Claude Custom Prompts",
+    "name": "Promptuary",
     "version": "1.0.0",
     "port": 9090
   },
@@ -288,7 +288,7 @@ If you encounter issues or have questions:
 
 ## Next Steps
 
-Now that you have the Claude Custom Prompts server and admin UI up and running, you can:
+Now that you have the Promptuary server and admin UI up and running, you can:
 
 1. Create more prompts and categories.
 2. Experiment with chain prompts for complex workflows.

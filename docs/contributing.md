@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Thank you for your interest in contributing to the Claude Prompts MCP Server! This document provides guidelines and instructions for contributing to this powerful Model Context Protocol server.
+Thank you for your interest in contributing to the Promptuary! This document provides guidelines and instructions for contributing to this powerful Model Context Protocol server.
 
 ## Code of Conduct
 
@@ -19,8 +19,8 @@ Please be respectful and considerate of others when contributing to this project
 
 ```bash
 # Clone your fork
-git clone https://github.com/your-username/claude-prompts-mcp.git
-cd claude-prompts-mcp
+git clone https://github.com/your-username/promptuary.git
+cd promptuary
 
 # Install server dependencies
 cd server
@@ -36,7 +36,7 @@ npm run dev
 ### Project Structure
 
 ```
-claude-prompts-mcp/
+promptuary/
 ├── server/                    # Main MCP server
 │   ├── src/                   # TypeScript source code
 │   │   ├── orchestration/     # Application orchestration and startup
@@ -289,4 +289,4 @@ By contributing to this project, you agree that your contributions will be licen
 
 ---
 
-Thank you for contributing to the Claude Prompts MCP Server! Your contributions help make AI prompt engineering more powerful and accessible for developers worldwide. 🚀
+Thank you for contributing to the Promptuary! Your contributions help make AI prompt engineering more powerful and accessible for developers worldwide. 🚀

@@ -1,6 +1,6 @@
 # Prompt Format Guide (v1.1.0)
 
-This document explains the format and structure of prompts in the Claude Custom Prompts server, including the new standardized execution headers and gate validation features introduced in v1.1.0.
+This document explains the format and structure of prompts in the Promptuary server, including the new standardized execution headers and gate validation features introduced in v1.1.0.
 
 ## Prompt Configuration System
 

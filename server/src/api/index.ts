@@ -120,7 +120,7 @@ export class ApiManager {
   private setupBasicRoutes(app: express.Application): void {
     app.get("/", (_req: Request, res: Response) => {
       res.send(
-        "Claude Custom Prompts MCP Server - Use /mcp endpoint for MCP connections"
+        "Promptuary - Use /mcp endpoint for MCP connections"
       );
     });
 

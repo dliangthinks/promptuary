@@ -1,6 +1,6 @@
 # Release Notes - Version 1.1.0
 
-## Claude Prompts MCP Server v1.1.0 - "Reliable Chains"
+## Promptuary v1.1.0 - "Reliable Chains"
 **Release Date**: December 2024
 
 ### 🎉 Major Release Highlights
@@ -274,4 +274,4 @@ We're continuously improving the system based on user feedback. Please share you
 
 ---
 
-*Thank you for using Claude Prompts MCP Server. This release represents a major step forward in reliable AI workflow execution.*
+*Thank you for using Promptuary. This release represents a major step forward in reliable AI workflow execution.*

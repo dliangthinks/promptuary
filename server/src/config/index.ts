@@ -12,9 +12,9 @@ import { Config } from "../types/index.js";
  */
 const DEFAULT_CONFIG: Config = {
   server: {
-    name: "Claude Custom Prompts",
+    name: "Promptuary",
     version: "1.0.0",
-    port: 3456,
+    port: 9090,
   },
   prompts: {
     file: "promptsConfig.json",
@@ -23,6 +23,9 @@ const DEFAULT_CONFIG: Config = {
     default: "sse",
     sse: { enabled: true },
     stdio: { enabled: true },
+  },
+  viewer: {
+    autoStart: false,
   },
 };
 
@@ -66,6 +69,13 @@ export class ConfigManager {
    */
   getConfig(): Config {
     return this.config;
+  }
+
+  /**
+   * Get viewer configuration
+   */
+  getViewerConfig() {
+    return this.config.viewer ?? DEFAULT_CONFIG.viewer;
   }
 
   /**
@@ -165,6 +175,16 @@ export class ConfigManager {
       this.config.transports = {
         ...DEFAULT_CONFIG.transports,
         ...this.config.transports,
+      };
+    }
+
+    // Ensure viewer config exists
+    if (!this.config.viewer) {
+      this.config.viewer = DEFAULT_CONFIG.viewer;
+    } else {
+      this.config.viewer = {
+        ...DEFAULT_CONFIG.viewer,
+        ...this.config.viewer,
       };
     }
   }
