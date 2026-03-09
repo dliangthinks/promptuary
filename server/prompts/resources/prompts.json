@@ -1,0 +1,92 @@
+{
+  "prompts": [
+    {
+      "id": "resource_allocation",
+      "name": "Resource Allocation Plan",
+      "category": "resources",
+      "description": "Create comprehensive resource allocation plan matching resources to project activities",
+      "file": "resource_allocation.md",
+      "arguments": [
+        {
+          "name": "project_name",
+          "description": "Name of the project",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "team_structure",
+      "name": "Team Structure & RACI Matrix",
+      "category": "resources",
+      "description": "Define team structure and create RACI matrix for roles and responsibilities",
+      "file": "team_structure.md",
+      "arguments": []
+    },
+    {
+      "id": "capacity_planning",
+      "name": "Resource Capacity Planning",
+      "category": "resources",
+      "description": "Analyze resource capacity, utilization, and identify over/under-allocation",
+      "file": "capacity_planning.md",
+      "arguments": [
+        {
+          "name": "time_period",
+          "description": "Planning time period",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "skills_gap_analysis",
+      "name": "Skills Gap Analysis",
+      "category": "resources",
+      "description": "Identify required skills versus available skills and plan for training or hiring",
+      "file": "skills_gap_analysis.md",
+      "arguments": []
+    },
+    {
+      "id": "resource_cost_estimation",
+      "name": "Resource Cost Estimation",
+      "category": "resources",
+      "description": "Estimate resource costs including labor, materials, and equipment",
+      "file": "resource_cost_estimation.md",
+      "arguments": []
+    },
+    {
+      "id": "procurement_planning",
+      "name": "Procurement Planning",
+      "category": "resources",
+      "description": "Plan procurement of external resources, services, or materials",
+      "file": "procurement_planning.md",
+      "arguments": []
+    },
+    {
+      "id": "vendor_selection",
+      "name": "Vendor Selection Criteria",
+      "category": "resources",
+      "description": "Develop vendor evaluation criteria and selection process",
+      "file": "vendor_selection.md",
+      "arguments": [
+        {
+          "name": "procurement_type",
+          "description": "Type of procurement (e.g., 'software', 'consulting services')",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "resource_calendar",
+      "name": "Resource Calendar Creation",
+      "category": "schedule",
+      "description": "Create resource calendars accounting for availability, holidays, and working hours",
+      "file": "resource_calendar.md",
+      "arguments": [
+        {
+          "name": "time_period",
+          "description": "Time period to cover (e.g., 'Q1 2024', '6 months')",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

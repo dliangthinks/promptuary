@@ -96,16 +96,15 @@ export class McpToolsManager {
     // Register each tool
     this.registerExecutePrompt();
     this.registerListPrompts();
+    this.promptManagementTools.registerReadPrompt();
+    this.promptManagementTools.registerCreatePrompt();
     this.promptManagementTools.registerUpdatePrompt();
+    this.promptManagementTools.registerCreateCategory();
+    this.promptManagementTools.registerDeleteCategory();
+    this.promptManagementTools.registerRenameCategory();
     this.promptManagementTools.registerDeletePrompt();
-    this.promptManagementTools.registerModifyPromptSection();
+    this.promptManagementTools.registerMovePrompt();
     this.promptManagementTools.registerReloadPrompts();
-
-    // Also register the old name as an alias for backward compatibility
-    this.registerProcessSlashCommandAlias();
-
-    // Register analytics tool
-    this.registerExecutionAnalytics();
 
     this.logger.info("All MCP tools registered successfully");
   }
@@ -1377,6 +1376,7 @@ export class McpToolsManager {
   private registerListPrompts(): void {
     this.mcpServer.tool(
       "listprompts",
+      "List all available prompts with their exact IDs, categories, and descriptions. ALWAYS call this first before using read_prompt, delete_prompt, move_prompt, or execute_prompt to get valid prompt IDs. Do NOT guess prompt IDs.",
       {
         command: z
           .string()
@@ -1571,10 +1571,8 @@ export class McpToolsManager {
       }
     });
 
-    // Add each category and its prompts
+    // Add each category and its prompts (include empty categories so UI can show them)
     Object.entries(promptsByCategory).forEach(([categoryId, prompts]) => {
-      if (prompts.length === 0) return;
-
       const categoryName = categoryMap[categoryId] || categoryId;
       listpromptsText += `## ${categoryName}\n\n`;
 

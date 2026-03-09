@@ -1,0 +1,84 @@
+{
+  "prompts": [
+    {
+      "id": "budget_development",
+      "name": "Project Budget Development",
+      "category": "finance",
+      "description": "Develop comprehensive project budget with cost categories and reserves",
+      "file": "budget_development.md",
+      "arguments": [
+        {
+          "name": "project_name",
+          "description": "Name of the project",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "cost_estimation",
+      "name": "Cost Estimation",
+      "category": "finance",
+      "description": "Perform detailed cost estimation using bottom-up, top-down, or parametric methods",
+      "file": "cost_estimation.md",
+      "arguments": [
+        {
+          "name": "estimation_method",
+          "description": "Preferred estimation method (e.g., 'bottom-up', 'top-down', 'parametric')",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "earned_value_analysis",
+      "name": "Earned Value Analysis",
+      "category": "finance",
+      "description": "Perform earned value management (EVM) analysis with CPI, SPI, and forecasting",
+      "file": "earned_value_analysis.md",
+      "arguments": []
+    },
+    {
+      "id": "financial_status_report",
+      "name": "Financial Status Report",
+      "category": "finance",
+      "description": "Generate comprehensive financial status report with budget vs. actual analysis",
+      "file": "financial_status_report.md",
+      "arguments": [
+        {
+          "name": "reporting_period",
+          "description": "Reporting period",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "cost_benefit_analysis",
+      "name": "Cost-Benefit Analysis",
+      "category": "finance",
+      "description": "Conduct cost-benefit analysis including ROI, NPV, and payback period calculations",
+      "file": "cost_benefit_analysis.md",
+      "arguments": []
+    },
+    {
+      "id": "funding_request",
+      "name": "Funding Request Documentation",
+      "category": "finance",
+      "description": "Prepare funding request documentation with justification and financial projections",
+      "file": "funding_request.md",
+      "arguments": [
+        {
+          "name": "funding_amount",
+          "description": "Requested funding amount",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "budget_variance_analysis",
+      "name": "Budget Variance Analysis",
+      "category": "finance",
+      "description": "Analyze budget variances and identify root causes with corrective action recommendations",
+      "file": "budget_variance_analysis.md",
+      "arguments": []
+    }
+  ]
+}

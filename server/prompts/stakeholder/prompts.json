@@ -1,0 +1,84 @@
+{
+  "prompts": [
+    {
+      "id": "stakeholder_identification",
+      "name": "Stakeholder Identification",
+      "category": "stakeholder",
+      "description": "Identify and map all project stakeholders with their characteristics and influence",
+      "file": "stakeholder_identification.md",
+      "arguments": [
+        {
+          "name": "project_context",
+          "description": "Project context or background",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "stakeholder_analysis",
+      "name": "Stakeholder Analysis",
+      "category": "stakeholder",
+      "description": "Analyze stakeholders using power/interest grid and other assessment frameworks",
+      "file": "stakeholder_analysis.md",
+      "arguments": []
+    },
+    {
+      "id": "communication_plan",
+      "name": "Communication Plan Development",
+      "category": "stakeholder",
+      "description": "Develop comprehensive communication plan tailored to stakeholder needs",
+      "file": "communication_plan.md",
+      "arguments": []
+    },
+    {
+      "id": "engagement_strategy",
+      "name": "Stakeholder Engagement Strategy",
+      "category": "stakeholder",
+      "description": "Create stakeholder engagement strategy with tactics for different stakeholder groups",
+      "file": "engagement_strategy.md",
+      "arguments": []
+    },
+    {
+      "id": "meeting_minutes",
+      "name": "Meetings",
+      "category": "stakeholder",
+      "description": "Document meeting minutes with decisions, action items, and follow-up tracking",
+      "file": "meeting_minutes.md",
+      "arguments": [
+        {
+          "name": "meeting_type",
+          "description": "Type of meeting (e.g., 'kickoff', 'status review', 'steering committee')",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "stakeholder_status_report",
+      "name": "Stakeholder Status Report",
+      "category": "stakeholder",
+      "description": "Generate stakeholder-focused status report highlighting key information for different audiences",
+      "file": "stakeholder_status_report.md",
+      "arguments": [
+        {
+          "name": "audience",
+          "description": "Target audience (e.g., 'executive', 'team', 'sponsor')",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "conflict_resolution",
+      "name": "Conflict Resolution Framework",
+      "category": "stakeholder",
+      "description": "Guide conflict resolution process with structured approach and documentation",
+      "file": "conflict_resolution.md",
+      "arguments": [
+        {
+          "name": "conflict_description",
+          "description": "Brief description of the conflict",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

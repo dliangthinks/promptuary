@@ -3,11 +3,11 @@
   "name": "promptuary",
   "display_name": "Promptuary",
   "version": "1.0.0",
-  "description": "Intelligent prompt management system",
+  "description": "Intelligent prompt management system, view and edit prompts at http://localhost:9090/viewer/",
   "author": {
     "name": "Dong Liang"  
    },
-  "icon": "assets/icon.png",
+  "icon": "icon.png",
   "homepage": "https://dliangthinks.me",
   
   "server": {
@@ -18,6 +18,8 @@
       "args": [
         "${__dirname}/server/dist/index.js"
       ]
+  
     }
   }
+
 }

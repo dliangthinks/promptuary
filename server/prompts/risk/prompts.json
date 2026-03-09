@@ -1,0 +1,78 @@
+{
+  "prompts": [
+    {
+      "id": "risk_identification",
+      "name": "Risk Identification Workshop",
+      "category": "risk",
+      "description": "Facilitate structured risk identification using various techniques and categories",
+      "file": "risk_identification.md",
+      "arguments": [
+        {
+          "name": "project_context",
+          "description": "Project context or area of focus",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "risk_register",
+      "name": "Risk Register Creation",
+      "category": "risk",
+      "description": "Create and maintain comprehensive risk register with all identified risks",
+      "file": "risk_register.md",
+      "arguments": []
+    },
+    {
+      "id": "risk_assessment",
+      "name": "Risk Assessment & Prioritization",
+      "category": "risk",
+      "description": "Perform qualitative risk assessment using probability and impact analysis",
+      "file": "risk_assessment.md",
+      "arguments": []
+    },
+    {
+      "id": "risk_response_planning",
+      "name": "Risk Response Planning",
+      "category": "risk",
+      "description": "Develop risk response strategies (avoid, mitigate, transfer, accept)",
+      "file": "risk_response_planning.md",
+      "arguments": [
+        {
+          "name": "risk_description",
+          "description": "Description of the risk to plan for",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "risk_monitoring",
+      "name": "Risk Monitoring Report",
+      "category": "risk",
+      "description": "Generate risk monitoring report tracking risk status and response effectiveness",
+      "file": "risk_monitoring.md",
+      "arguments": [
+        {
+          "name": "reporting_period",
+          "description": "Reporting period (e.g., 'monthly', 'sprint 5')",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "issue_log",
+      "name": "Issue Log Management",
+      "category": "risk",
+      "description": "Track and manage project issues that have materialized from risks or emerged unexpectedly",
+      "file": "issue_log.md",
+      "arguments": []
+    },
+    {
+      "id": "opportunity_analysis",
+      "name": "Opportunity Analysis",
+      "category": "risk",
+      "description": "Identify and analyze positive risks (opportunities) and exploitation strategies",
+      "file": "opportunity_analysis.md",
+      "arguments": []
+    }
+  ]
+}

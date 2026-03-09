@@ -1,55 +1,49 @@
 {
   "categories": [
     {
-      "id": "code",
-      "name": "Code",
-      "description": "Prompts related to programming and software development"
+      "id": "governance",
+      "name": "Governance",
+      "description": "Project governance, discovery, and management prompts"
     },
     {
-      "id": "analysis",
-      "name": "Analysis",
-      "description": "Prompts for analyzing content and data"
+      "id": "scope",
+      "name": "Scope",
+      "description": "Project scope management prompts"
     },
     {
-      "id": "education",
-      "name": "Education",
-      "description": "Prompts for learning and teaching concepts"
+      "id": "schedule",
+      "name": "Schedule",
+      "description": "Project schedule and timeline management prompts"
     },
     {
-      "id": "development",
-      "name": "Development",
-      "description": "Prompts for software development and code quality"
+      "id": "resources",
+      "name": "Resource",
+      "description": "Project resource management prompts"
     },
     {
-      "id": "research-tools",
-      "name": "Research Tools",
-      "description": "Advanced prompts and chains for conducting comprehensive research and analysis"
+      "id": "risk",
+      "name": "Risk",
+      "description": "Project risk management prompts"
     },
     {
-      "id": "debugging",
-      "name": "Debugging",
-      "description": "Prompts related to debugging"
+      "id": "finance",
+      "name": "Finance",
+      "description": "Project finance and budget management prompts"
     },
     {
-      "id": "content_processing",
-      "name": "Content Processing",
-      "description": "Prompts related to content_processing"
-    },
-    {
-      "id": "pm",
-      "name": "Project Management",
-      "description": "Prompts related to pm"
+      "id": "stakeholder",
+      "name": "Stakeholder",
+      "description": "Project stakeholder management prompts"
     }
   ],
   "prompts": [],
   "imports": [
-    "prompts/code/prompts.json",
-    "prompts/analysis/prompts.json",
-    "prompts/education/prompts.json",
-    "prompts/development/prompts.json",
-    "prompts/research-tools/prompts.json",
-    "prompts/debugging/prompts.json",
-    "prompts/content_processing/prompts.json",
-    "prompts/pm/prompts.json"
+    "prompts/governance/prompts.json",
+    "prompts/scope/prompts.json",
+    "prompts/schedule/prompts.json",
+    "prompts/resources/prompts.json",
+    "prompts/risk/prompts.json",
+    "prompts/finance/prompts.json",
+    "prompts/stakeholder/prompts.json"
   ]
 }

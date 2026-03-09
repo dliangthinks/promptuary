@@ -26,6 +26,7 @@ import {
   createConversationManager,
 } from "./conversation-manager.js";
 import { createPromptExecutor, PromptExecutor } from "./prompt-executor.js";
+import { registerMcpApps } from "../mcp-apps/index.js";
 
 // Import types
 import { Category, ConvertedPrompt, PromptData } from "../types/index.js";
@@ -383,10 +384,6 @@ ${attemptedPaths}
     this.mcpServer = new McpServer({
       name: config.server.name,
       version: config.server.version,
-      capabilities: {
-        prompts: { listChanged: true },
-        // TODO: Add other capabilities if supported, e.g., for tools
-      },
     });
 
     // Only log completion in verbose mode
@@ -648,6 +645,9 @@ ${attemptedPaths}
 
     // Register all prompts
     await this.promptManager.registerAllPrompts(this.convertedPrompts);
+
+    // Register MCP Apps (prompt_manager UI)
+    registerMcpApps(this.mcpServer, this.logger);
 
     this.logger.info("All modules initialized successfully");
   }

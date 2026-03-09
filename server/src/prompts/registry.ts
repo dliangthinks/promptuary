@@ -23,6 +23,7 @@ export class PromptRegistry {
   private templateProcessor: TemplateProcessor;
   private conversationHistory: ConversationHistoryItem[] = [];
   private readonly MAX_HISTORY_SIZE = 100;
+  private registeredPromptHandles: Array<{ remove(): void }> = [];
 
   constructor(
     logger: Logger,
@@ -98,12 +99,18 @@ export class PromptRegistry {
 
       // Register the prompt based on the configuration mode
       if (registrationMode === "id" || registrationMode === "both") {
-        this.mcpServer.prompt(promptData.id, argsSchema, promptHandler);
+        const handle = this.mcpServer.prompt(promptData.id, argsSchema, promptHandler);
+        if (handle && typeof handle.remove === "function") {
+          this.registeredPromptHandles.push(handle);
+        }
         this.logger.debug(`Registered prompt with ID: ${promptData.id}`);
       }
 
       if (registrationMode === "name" || registrationMode === "both") {
-        this.mcpServer.prompt(promptData.name, argsSchema, promptHandler);
+        const handle = this.mcpServer.prompt(promptData.name, argsSchema, promptHandler);
+        if (handle && typeof handle.remove === "function") {
+          this.registeredPromptHandles.push(handle);
+        }
         this.logger.debug(`Registered prompt with name: ${promptData.name}`);
       }
 
@@ -121,15 +128,19 @@ export class PromptRegistry {
    * Unregister all prompts if possible
    */
   async unregisterAllPrompts(): Promise<void> {
-    if (typeof (this.mcpServer as any).unregisterAllPrompts === "function") {
+    if (this.registeredPromptHandles.length > 0) {
       try {
-        (this.mcpServer as any).unregisterAllPrompts();
-        this.logger.info("Unregistered all existing prompts");
+        for (const handle of this.registeredPromptHandles) {
+          handle.remove();
+        }
+        this.logger.info(`Unregistered ${this.registeredPromptHandles.length} prompt handles`);
+        this.registeredPromptHandles = [];
       } catch (unregisterError) {
         this.logger.warn(
           "Could not unregister existing prompts:",
           unregisterError
         );
+        this.registeredPromptHandles = [];
       }
     }
   }

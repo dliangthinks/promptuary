@@ -242,6 +242,8 @@ export class TransportManager {
     return this.transport === TransportType.SSE;
   }
 
+
+
   /**
    * Get active SSE connections count
    */

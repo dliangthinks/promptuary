@@ -1,0 +1,64 @@
+{
+  "prompts": [
+    {
+      "id": "schedule_development",
+      "name": "Project Schedule Development",
+      "category": "schedule",
+      "description": "Develop comprehensive project schedule with activities, dependencies, and duration estimates",
+      "file": "schedule_development.md",
+      "arguments": [
+        {
+          "name": "project_name",
+          "description": "Name of the project",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "critical_path_analysis",
+      "name": "Critical Path Analysis",
+      "category": "schedule",
+      "description": "Identify and analyze the critical path and schedule float for project activities",
+      "file": "critical_path_analysis.md",
+      "arguments": []
+    },
+    {
+      "id": "milestone_planning",
+      "name": "Milestone Planning",
+      "category": "schedule",
+      "description": "Define and document key project milestones with target dates and success criteria",
+      "file": "milestone_planning.md",
+      "arguments": []
+    },
+    {
+      "id": "sprint_planning",
+      "name": "Sprint Planning Assistant",
+      "category": "schedule",
+      "description": "Plan sprint goals, capacity, and story selection for agile projects",
+      "file": "sprint_planning.md",
+      "arguments": [
+        {
+          "name": "sprint_number",
+          "description": "Sprint number or iteration",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "schedule_baseline",
+      "name": "Schedule Baseline & Tracking",
+      "category": "schedule",
+      "description": "Establish schedule baseline and track actual progress against planned schedule",
+      "file": "schedule_baseline.md",
+      "arguments": []
+    },
+    {
+      "id": "timeline_visualization",
+      "name": "Timeline Visualization Helper",
+      "category": "schedule",
+      "description": "Create visual timeline representations and Gantt chart data for project schedules",
+      "file": "timeline_visualization.md",
+      "arguments": []
+    }
+  ]
+}

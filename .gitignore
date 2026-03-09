@@ -6,6 +6,8 @@ yarn-error.log
 
 # Build output
 server/dist/
+server/app/dist/
+server/app/node_modules/
 build/
 out/
 server/package-lock.json

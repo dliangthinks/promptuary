@@ -219,17 +219,27 @@ export class PromptLoader {
                 return null;
               }
 
+              // Derive category strictly from the directory of the import path
+              // This enforces that categories come only from promptsConfig.json structure
+              const derivedCategoryId = path.basename(categoryPath);
+
               // If the file path is already absolute or starts with the category folder, keep it as is
               if (
                 prompt.file.startsWith("/") ||
                 prompt.file.startsWith(categoryPath)
               ) {
-                return prompt;
+                return {
+                  ...prompt,
+                  // Override any category specified in the prompt with the derived category
+                  category: derivedCategoryId,
+                };
               }
 
               // Otherwise, update the file path to include the category folder
               return {
                 ...prompt,
+                // Override any category specified in the prompt with the derived category
+                category: derivedCategoryId,
                 file: path.join(categoryPath, prompt.file),
               };
             })

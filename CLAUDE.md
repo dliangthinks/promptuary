@@ -47,9 +47,27 @@ This is a **Model Context Protocol (MCP) server** that provides AI prompt manage
 - **Converter system** for format transformation and validation
 
 #### `/server/src/mcp-tools/`
-- **Prompt management tools** for create, update, delete, and reload operations
-- **Interactive prompt execution** with argument parsing and validation
-- **Chain execution** support for multi-step workflows
+
+**Chat tools** (used by Claude in conversation):
+- `execute_prompt` — Renders prompt template with Nunjucks variable substitution
+- `listprompts` — Lists all available prompts (ONE WORD, not `list_prompts`)
+- `process_slash_command` — DEPRECATED alias for `execute_prompt`
+- `execution_analytics` — View execution metrics
+
+**Prompt management tools** (used by both Claude and the MCP App UI):
+- `read_prompt` — Reads raw .md file (no rendering). Used by App for editing.
+- `create_prompt` — Creates new prompt. Category is required and must already exist (no auto-create).
+- `update_prompt` — Updates existing prompt content/description. No category parameter — use `move_prompt` to change category.
+- `delete_prompt` — Deletes prompt by ID (arg is `{ id }`, NOT `{ name }`).
+- `move_prompt` — Moves prompt between categories. Auto-cleans empty source category.
+- `delete_category` — Deletes empty category. Errors if prompts still exist.
+- `modify_prompt_section` — Modifies a specific section of a prompt.
+- `reload_prompts` — Hot-reloads prompts or triggers full server restart.
+
+**App entry tool:**
+- `prompt_manager` — Opens the MCP App UI in Claude Desktop
+
+**Chain execution** support for multi-step workflows
 
 #### `/server/src/transport/`
 - **STDIO transport** for Claude Desktop integration
@@ -148,6 +166,33 @@ server/prompts/
 - **Health check validation** every 30 seconds
 - **Diagnostic collection** for troubleshooting
 - **Graceful shutdown** with resource cleanup
+
+### MCP App (Interactive UI)
+
+#### Architecture
+- `server/app/` — React app bundled into single HTML via `vite-plugin-singlefile`
+- `server/src/mcp-apps/index.ts` — Registers `prompt_manager` tool + app resource
+- Registration uses `@modelcontextprotocol/ext-apps/server`: `registerAppTool`, `registerAppResource`
+- Resource URI: `ui://promptuary/index.html`
+- Called from orchestration Phase 3 after `registerAllPrompts()`
+
+#### Build
+- `npm run build:app` builds the React app into `server/app/dist/index.html`
+- `npm run build` runs `build:app` then `tsc`
+- App bundle is ~600KB (single-file HTML)
+
+#### Critical Gotchas
+- Tool name is `listprompts` (one word), NOT `list_prompts`
+- `delete_prompt` takes `{ id }`, NOT `{ name }`
+- App is SANDBOXED: `callServerTool()` results stay in JS, cannot inject into Claude conversation
+- `execute_prompt` must NEVER be used in the App UI — use `read_prompt` to load raw .md for editing
+- Saving `execute_prompt` output (rendered template) back to .md file CORRUPTS the prompt and it disappears after reload
+- `create_prompt` does NOT auto-create categories — category must already exist
+- `update_prompt` has NO category parameter — use `move_prompt` to change category
+- App dist path from compiled `dist/mcp-apps/`: resolve `../..` then `app/dist/`
+- MCP SDK 1.27.1+: do NOT pass `capabilities` to `McpServer` constructor
+- `viewer.autoStart: true` in config.json makes STDIO mode also bind HTTP port — will crash if port is in use
+- CSS must use `height: auto` (not `100vh`) and no `max-width` constraints — host iframe determines size
 
 ### Key Development Guidelines
 

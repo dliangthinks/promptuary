@@ -1,0 +1,76 @@
+{
+  "prompts": [
+    {
+      "id": "scope_definition",
+      "name": "Scope Definition & WBS Creation",
+      "category": "scope",
+      "description": "Create comprehensive project scope statement and Work Breakdown Structure (WBS) through structured questioning",
+      "file": "scope_definition.md",
+      "arguments": [
+        {
+          "name": "project_name",
+          "description": "Name of the project",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "requirements_gathering",
+      "name": "Requirements Gathering & Analysis",
+      "category": "scope",
+      "description": "Systematically collect, document, and analyze project requirements from stakeholders",
+      "file": "requirements_gathering.md",
+      "arguments": [
+        {
+          "name": "project_context",
+          "description": "Brief project context or background",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "scope_baseline",
+      "name": "Scope Baseline Documentation",
+      "category": "scope",
+      "description": "Document the approved scope baseline including scope statement, WBS, and WBS dictionary",
+      "file": "scope_baseline.md",
+      "arguments": []
+    },
+    {
+      "id": "deliverables_checklist",
+      "name": "Deliverables Checklist Generator",
+      "category": "scope",
+      "description": "Generate comprehensive deliverables checklist with acceptance criteria",
+      "file": "deliverables_checklist.md",
+      "arguments": []
+    },
+    {
+      "id": "product_backlog",
+      "name": "Product Backlog Creation",
+      "category": "scope",
+      "description": "Create and prioritize product backlog for agile projects",
+      "file": "product_backlog.md",
+      "arguments": [
+        {
+          "name": "product_vision",
+          "description": "Product vision or goal",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "scope_change_request",
+      "name": "Scope Change Request Evaluation",
+      "category": "scope",
+      "description": "Evaluate and document scope change requests with impact analysis",
+      "file": "scope_change_request.md",
+      "arguments": [
+        {
+          "name": "change_description",
+          "description": "Description of the proposed change",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
