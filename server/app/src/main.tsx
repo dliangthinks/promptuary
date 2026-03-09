@@ -1,13 +1,17 @@
 import type { McpUiHostContext } from "@modelcontextprotocol/ext-apps";
 import { useApp } from "@modelcontextprotocol/ext-apps/react";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { StrictMode, useEffect, useState } from "react";
+import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.js";
+
+type AppMode = "connecting" | "mcp" | "rest";
 
 function PromptManagerApp() {
   const [toolResult, setToolResult] = useState<CallToolResult | null>(null);
   const [hostContext, setHostContext] = useState<McpUiHostContext | undefined>();
+  const [mode, setMode] = useState<AppMode>("connecting");
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { app, error } = useApp({
     appInfo: { name: "Promptuary", version: "1.0.0" },
@@ -34,11 +38,30 @@ function PromptManagerApp() {
 
   useEffect(() => {
     if (app) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      setMode("mcp");
       setHostContext(app.getHostContext());
     }
   }, [app]);
 
-  if (error) {
+  useEffect(() => {
+    if (!app && mode === "connecting") {
+      timerRef.current = setTimeout(() => {
+        setMode("rest");
+      }, 1500);
+      return () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
+      };
+    }
+  }, [app, mode]);
+
+  if (error && mode === "mcp") {
     return (
       <div className="error-state">
         <strong>Error:</strong> {error.message}
@@ -46,8 +69,16 @@ function PromptManagerApp() {
     );
   }
 
-  if (!app) {
+  if (mode === "connecting") {
     return <div className="loading-state">Connecting...</div>;
+  }
+
+  if (mode === "rest") {
+    return (
+      <main>
+        <App app={null} toolResult={null} restMode={true} />
+      </main>
+    );
   }
 
   return (
@@ -59,7 +90,7 @@ function PromptManagerApp() {
         paddingLeft: hostContext?.safeAreaInsets?.left,
       }}
     >
-      <App app={app} toolResult={toolResult} />
+      <App app={app} toolResult={toolResult} restMode={false} />
     </main>
   );
 }

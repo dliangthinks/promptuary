@@ -14,18 +14,11 @@ import { createSimpleLogger, Logger } from "../logging/index.js";
 import { createMcpToolsManager, McpToolsManager } from "../mcp-tools/index.js";
 import { PromptManager } from "../prompts/index.js";
 import { ServerManager, startMcpServer } from "../server/index.js";
-import { TextReferenceManager } from "../text-references/index.js";
 import {
   createTransportManager,
   TransportManager,
 } from "../transport/index.js";
 
-// Import orchestration modules
-import {
-  ConversationManager,
-  createConversationManager,
-} from "./conversation-manager.js";
-import { createPromptExecutor, PromptExecutor } from "./prompt-executor.js";
 import { registerMcpApps } from "../mcp-apps/index.js";
 
 // Import types
@@ -38,10 +31,7 @@ import { Category, ConvertedPrompt, PromptData } from "../types/index.js";
 export class ApplicationOrchestrator {
   private logger: Logger;
   private configManager: ConfigManager;
-  private textReferenceManager: TextReferenceManager;
-  private conversationManager: ConversationManager;
   private promptManager: PromptManager;
-  private promptExecutor: PromptExecutor;
   private mcpToolsManager: McpToolsManager;
   private transportManager: TransportManager;
   private apiManager?: ApiManager;
@@ -59,10 +49,7 @@ export class ApplicationOrchestrator {
     // Will be initialized in startup()
     this.logger = null as any;
     this.configManager = null as any;
-    this.textReferenceManager = null as any;
-    this.conversationManager = null as any;
     this.promptManager = null as any;
-    this.promptExecutor = null as any;
     this.mcpToolsManager = null as any;
     this.transportManager = null as any;
     this.mcpServer = null as any;
@@ -373,12 +360,6 @@ ${attemptedPaths}
       this.logger.debug(`Process working directory: ${process.cwd()}`);
     }
 
-    // Initialize text reference manager
-    this.textReferenceManager = new TextReferenceManager(this.logger);
-
-    // Initialize conversation manager
-    this.conversationManager = createConversationManager(this.logger);
-
     // Create MCP server
     const config = this.configManager.getConfig();
     this.mcpServer = new McpServer({
@@ -405,7 +386,6 @@ ${attemptedPaths}
     // Initialize prompt manager
     this.promptManager = new PromptManager(
       this.logger,
-      this.textReferenceManager,
       this.configManager,
       this.mcpServer
     );
@@ -572,9 +552,6 @@ ${attemptedPaths}
           this.categories
         );
       }
-      if (this.promptExecutor) {
-        this.promptExecutor.updatePrompts(this.convertedPrompts);
-      }
       if (this.apiManager) {
         // apiManager might not exist for stdio
         this.apiManager.updateData(
@@ -615,14 +592,6 @@ ${attemptedPaths}
    * Phase 3: Initialize remaining modules with loaded data
    */
   private async initializeModules(): Promise<void> {
-    // Initialize prompt executor
-    this.promptExecutor = createPromptExecutor(
-      this.logger,
-      this.promptManager,
-      this.conversationManager
-    );
-    this.promptExecutor.updatePrompts(this.convertedPrompts);
-
     // Initialize MCP tools manager
     this.mcpToolsManager = createMcpToolsManager(
       this.logger,
@@ -744,9 +713,6 @@ ${attemptedPaths}
 
       // Step 2: Propagate the new data to all dependent modules.
       // This ensures all parts of the application are synchronized with the new state.
-      this.promptExecutor.updatePrompts(this.convertedPrompts);
-      this.logger.info("✅ PromptExecutor updated with new prompts.");
-
       if (this.mcpToolsManager) {
         this.mcpToolsManager.updateData(
           this.promptsData,
@@ -826,219 +792,12 @@ ${attemptedPaths}
       logger: this.logger,
       configManager: this.configManager,
       promptManager: this.promptManager,
-      textReferenceManager: this.textReferenceManager,
-      conversationManager: this.conversationManager,
-      promptExecutor: this.promptExecutor,
       mcpToolsManager: this.mcpToolsManager,
       apiManager: this.apiManager,
       serverManager: this.serverManager,
     };
   }
 
-  /**
-   * Validate application health - comprehensive health check
-   */
-  validateHealth(): {
-    healthy: boolean;
-    modules: {
-      foundation: boolean;
-      dataLoaded: boolean;
-      modulesInitialized: boolean;
-      serverRunning: boolean;
-    };
-    details: {
-      promptsLoaded: number;
-      categoriesLoaded: number;
-      serverStatus?: any;
-      moduleStatus: Record<string, boolean>;
-    };
-    issues: string[];
-  } {
-    const issues: string[] = [];
-    const moduleStatus: Record<string, boolean> = {};
-
-    // Check foundation modules
-    const foundationHealthy = !!(
-      this.logger &&
-      this.configManager &&
-      this.textReferenceManager
-    );
-    moduleStatus.foundation = foundationHealthy;
-    if (!foundationHealthy) {
-      issues.push("Foundation modules not properly initialized");
-    }
-
-    // Check data loading
-    const dataLoaded =
-      this.promptsData.length > 0 && this.categories.length > 0;
-    moduleStatus.dataLoaded = dataLoaded;
-    if (!dataLoaded) {
-      issues.push("Prompt data not loaded or empty");
-    }
-
-    // Check module initialization
-    const modulesInitialized = !!(
-      this.promptManager &&
-      this.promptExecutor &&
-      this.mcpToolsManager
-    );
-    moduleStatus.modulesInitialized = modulesInitialized;
-    moduleStatus.serverRunning = !!(
-      this.serverManager && this.transportManager
-    );
-
-    moduleStatus.configManager = !!this.configManager;
-    moduleStatus.logger = !!this.logger;
-    moduleStatus.promptManager = !!this.promptManager;
-    moduleStatus.textReferenceManager = !!this.textReferenceManager;
-    moduleStatus.conversationManager = !!this.conversationManager;
-    moduleStatus.promptExecutor = !!this.promptExecutor;
-    moduleStatus.mcpToolsManager = !!this.mcpToolsManager;
-    moduleStatus.transportManager = !!this.transportManager;
-    moduleStatus.apiManager = !!this.apiManager;
-    moduleStatus.serverManager = !!this.serverManager;
-
-    // Check overall health
-    const isHealthy =
-      foundationHealthy &&
-      dataLoaded &&
-      modulesInitialized &&
-      moduleStatus.serverRunning &&
-      issues.length === 0;
-
-    return {
-      healthy: isHealthy,
-      modules: {
-        foundation: foundationHealthy,
-        dataLoaded,
-        modulesInitialized,
-        serverRunning: moduleStatus.serverRunning,
-      },
-      details: {
-        promptsLoaded: this.promptsData.length,
-        categoriesLoaded: this.categories.length,
-        serverStatus: this.serverManager?.getStatus(),
-        moduleStatus,
-      },
-      issues,
-    };
-  }
-
-  /**
-   * Get performance metrics for monitoring
-   */
-  getPerformanceMetrics(): {
-    uptime: number;
-    memoryUsage: NodeJS.MemoryUsage;
-    process: {
-      pid: number;
-      nodeVersion: string;
-      platform: string;
-      arch: string;
-    };
-    application: {
-      promptsLoaded: number;
-      categoriesLoaded: number;
-      serverConnections?: number;
-    };
-  } {
-    return {
-      uptime: process.uptime(),
-      memoryUsage: process.memoryUsage(),
-      process: {
-        pid: process.pid,
-        nodeVersion: process.version,
-        platform: process.platform,
-        arch: process.arch,
-      },
-      application: {
-        promptsLoaded: this.promptsData.length,
-        categoriesLoaded: this.categories.length,
-        serverConnections: this.transportManager?.isSse()
-          ? this.transportManager.getActiveConnectionsCount()
-          : undefined,
-      },
-    };
-  }
-
-  /**
-   * Emergency diagnostic information for troubleshooting
-   */
-  getDiagnosticInfo(): {
-    timestamp: string;
-    health: ReturnType<ApplicationOrchestrator["validateHealth"]>;
-    performance: ReturnType<ApplicationOrchestrator["getPerformanceMetrics"]>;
-    configuration: {
-      transport: string;
-      configLoaded: boolean;
-    };
-    errors: string[];
-  } {
-    const errors: string[] = [];
-
-    try {
-      // Collect any recent errors or issues
-      if (!this.mcpServer) {
-        errors.push("MCP Server instance not available");
-      }
-
-      if (this.promptsData.length === 0) {
-        errors.push("No prompts loaded");
-      }
-
-      if (this.categories.length === 0) {
-        errors.push("No categories loaded");
-      }
-
-      return {
-        timestamp: new Date().toISOString(),
-        health: this.validateHealth(),
-        performance: this.getPerformanceMetrics(),
-        configuration: {
-          transport: this.transportManager?.getTransportType() || "unknown",
-          configLoaded: !!this.configManager,
-        },
-        errors,
-      };
-    } catch (error) {
-      errors.push(
-        `Error collecting diagnostic info: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
-
-      return {
-        timestamp: new Date().toISOString(),
-        health: {
-          healthy: false,
-          modules: {
-            foundation: false,
-            dataLoaded: false,
-            modulesInitialized: false,
-            serverRunning: false,
-          },
-          details: { promptsLoaded: 0, categoriesLoaded: 0, moduleStatus: {} },
-          issues: ["Failed to collect health information"],
-        },
-        performance: {
-          uptime: process.uptime(),
-          memoryUsage: process.memoryUsage(),
-          process: {
-            pid: process.pid,
-            nodeVersion: process.version,
-            platform: process.platform,
-            arch: process.arch,
-          },
-          application: { promptsLoaded: 0, categoriesLoaded: 0 },
-        },
-        configuration: {
-          transport: "unknown",
-          configLoaded: false,
-        },
-        errors,
-      };
-    }
-  }
 }
 
 /**

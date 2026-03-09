@@ -169,12 +169,23 @@ server/prompts/
 
 ### MCP App (Interactive UI)
 
-#### Architecture
+#### Dual-Mode Architecture
+- **Single React app** serves both MCP App (Claude Desktop) and REST browser modes
+- `main.tsx` tries MCP handshake via `useApp()`; if no host responds within 1.5s, falls back to REST mode
+- Three states: `"connecting"` → `"mcp"` (host found) or `"rest"` (timeout)
+- `<App>` receives `app: McpApp | null` and `restMode: boolean` — same component tree for both modes
+- **MCP mode** (`restMode=false`): uses `app.callServerTool()` for all data operations, `app.openLink()` for external links
+- **REST mode** (`restMode=true`): uses `fetch()` against `/api/v1/...` HTTP endpoints, `app` is `null`
+- Components branch on `restMode` for data calls but share all UI code
+- Expand button uses `app.openLink()` in MCP mode; hidden in REST mode (already in browser)
+
+#### Server Registration
 - `server/app/` — React app bundled into single HTML via `vite-plugin-singlefile`
 - `server/src/mcp-apps/index.ts` — Registers `prompt_manager` tool + app resource
 - Registration uses `@modelcontextprotocol/ext-apps/server`: `registerAppTool`, `registerAppResource`
 - Resource URI: `ui://promptuary/index.html`
 - Called from orchestration Phase 3 after `registerAllPrompts()`
+- `viewer.autoStart: true` in config.json also serves the same HTML on HTTP (port 9090)
 
 #### Build
 - `npm run build:app` builds the React app into `server/app/dist/index.html`

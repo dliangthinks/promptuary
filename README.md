@@ -67,6 +67,12 @@ Promptuary gives you two interfaces to work with. Some things can only be done i
 
 Open the UI by invoking the `prompt_manager` tool in Claude Desktop. The UI renders inline in the conversation.
 
+### Browser Viewer
+
+Click the **expand button** (↗) in the UI header to open the same prompt manager in your default browser at `http://localhost:9090/`. This lets you manage prompts in a dedicated browser tab alongside your Claude conversation — useful for editing prompts while testing them in chat.
+
+The browser viewer is the same React app with the same features; it talks to the server over REST instead of the MCP App SDK. No extra setup is needed — the viewer starts automatically when the server is running.
+
 ### Grid View
 
 The main view shows all prompts as icons grouped by category.
@@ -239,6 +245,49 @@ npm run start:verbose    # Verbose logging
 
 - `MCP_SERVER_ROOT` — Override server root directory detection
 - `MCP_PROMPTS_CONFIG_PATH` — Direct path to prompts configuration file
+
+---
+
+## Packaging as DXT
+
+To distribute Promptuary as an installable MCP package (`.dxt`):
+
+```bash
+# 1. Install the MCP build tool (one-time)
+npm i -g @anthropic-ai/mcpb
+
+# 2. Initialize the manifest at the repo root
+mcpb init
+
+# 3. Build and pack
+cd server && npm run build && cd ..
+mcpb pack
+```
+
+`mcpb init` generates a `manifest.json` at the repo root. Example:
+
+```json
+{
+  "dxt_version": "0.1",
+  "name": "promptuary",
+  "display_name": "Promptuary",
+  "version": "2.0.0",
+  "description": "Interactive prompt management system within chat",
+  "author": {
+    "name": "Dong Liang"
+  },
+  "icon": "icon.png",
+  "homepage": "https://dliangthinks.me",
+  "server": {
+    "type": "node",
+    "entry_point": "server/dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/dist/index.js"]
+    }
+  }
+}
+```
 
 ---
 

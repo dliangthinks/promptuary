@@ -225,17 +225,6 @@ export class PromptRegistry {
           };
         }
 
-        // Check if this is a chain prompt
-        if (
-          promptData.isChain &&
-          promptData.chainSteps &&
-          promptData.chainSteps.length > 0
-        ) {
-          this.logger.info(
-            `Prompt '${promptData.name}' is a chain with ${promptData.chainSteps.length} steps. NOT automatically executing the chain.`
-          );
-          // Note: Chain execution is handled elsewhere
-        }
 
         // Create messages array with only user and assistant roles
         const messages: {
@@ -492,7 +481,7 @@ export class PromptRegistry {
     categoriesCount: number;
     averageArgumentsPerPrompt: number;
   } {
-    const chainPrompts = prompts.filter((p) => p.isChain).length;
+    const chainPrompts = 0;
     const toolEnabledPrompts = prompts.filter((p) => p.tools).length;
     const categoriesSet = new Set(prompts.map((p) => p.category));
     const totalArguments = prompts.reduce(

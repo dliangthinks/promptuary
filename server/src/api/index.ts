@@ -77,7 +77,7 @@ export class ApiManager {
     // Enable CORS for Cursor integration
     app.use((req, res, next) => {
       res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+      res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
       res.header(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"
@@ -118,10 +118,15 @@ export class ApiManager {
    * Setup basic routes (home, health)
    */
   private setupBasicRoutes(app: express.Application): void {
-    app.get("/", (_req: Request, res: Response) => {
-      res.send(
-        "Promptuary - Use /mcp endpoint for MCP connections"
-      );
+    app.get("/", async (_req: Request, res: Response) => {
+      try {
+        const appHtmlPath = this.getAppHtmlPath();
+        const html = await readFile(appHtmlPath, "utf8");
+        res.type("html").send(html);
+      } catch (error) {
+        this.logger.warn("App HTML not found, serving fallback:", error);
+        res.send("Promptuary - Use /mcp endpoint for MCP connections");
+      }
     });
 
     // Health check endpoint
@@ -254,8 +259,6 @@ export class ApiManager {
           content: fileContent,
           systemMessage: converted?.systemMessage,
           userMessageTemplate: converted?.userMessageTemplate,
-          isChain: converted?.isChain ?? false,
-          chainSteps: converted?.chainSteps ?? [],
           updatedAt: fileStats.mtime.toISOString(),
         });
       } catch (error) {
@@ -307,6 +310,67 @@ export class ApiManager {
           error: "Internal server error",
           details: error instanceof Error ? error.message : String(error),
         });
+      }
+    });
+
+    // Move prompt to a different category
+    app.post("/api/v1/prompts/:id/move", async (req: Request, res: Response) => {
+      try {
+        const id = req.params.id;
+        const { target_category } = req.body ?? {};
+
+        if (!id || !target_category) {
+          res.status(400).json({ error: "Prompt ID and target_category are required" });
+          return;
+        }
+
+        const promptInfo = this.findPromptById(id);
+        if (!promptInfo) {
+          res.status(404).json({ error: `Prompt '${id}' not found` });
+          return;
+        }
+
+        // Read source category prompts.json
+        const sourceCategoryPromptsPath = await this.ensureCategoryPromptsFile(promptInfo.prompt.category);
+        const sourceContent = await readFile(sourceCategoryPromptsPath, "utf8");
+        const sourceData = JSON.parse(sourceContent) as { prompts?: PromptData[] };
+
+        if (!Array.isArray(sourceData.prompts)) sourceData.prompts = [];
+
+        // Remove from source
+        sourceData.prompts = sourceData.prompts.filter(p => p.id !== id);
+        await safeWriteFile(sourceCategoryPromptsPath, JSON.stringify(sourceData, null, 2), "utf8");
+
+        // Read target category prompts.json
+        const targetCategoryPromptsPath = await this.ensureCategoryPromptsFile(target_category);
+        const targetContent = await readFile(targetCategoryPromptsPath, "utf8");
+        const targetData = JSON.parse(targetContent) as { prompts?: PromptData[] };
+
+        if (!Array.isArray(targetData.prompts)) targetData.prompts = [];
+
+        // Move the markdown file
+        const oldFilePath = this.getPromptFilePath(promptInfo.prompt);
+        const newDir = path.dirname(targetCategoryPromptsPath);
+        const newFilePath = path.join(newDir, path.basename(promptInfo.prompt.file));
+
+        const fileContent = await readFile(oldFilePath, "utf8");
+        await safeWriteFile(newFilePath, fileContent, "utf8");
+        await rm(oldFilePath, { force: true });
+
+        // Add to target with updated file path
+        const movedPrompt = { ...promptInfo.prompt, category: target_category, file: path.basename(promptInfo.prompt.file) };
+        targetData.prompts.push(movedPrompt);
+        await safeWriteFile(targetCategoryPromptsPath, JSON.stringify(targetData, null, 2), "utf8");
+
+        // Reload
+        if (this.promptManager) {
+          await this.reloadPromptData();
+        }
+
+        res.json({ success: true, message: `Prompt '${id}' moved to '${target_category}'` });
+      } catch (error) {
+        this.logger.error("Error moving prompt:", error);
+        res.status(500).json({ error: "Internal server error", details: error instanceof Error ? error.message : String(error) });
       }
     });
   }
@@ -1041,6 +1105,15 @@ Replace this section with the content you want to send to the assistant. Use {{p
     }
 
     return promptsJsonPath;
+  }
+
+  /**
+   * Resolve path to the MCP App's bundled HTML file
+   */
+  private getAppHtmlPath(): string {
+    // When running from dist/, go up to server root, then into app/dist/
+    const currentDir = path.dirname(new URL(import.meta.url).pathname);
+    return path.resolve(currentDir, "..", "..", "app", "dist", "index.html");
   }
 
   /**

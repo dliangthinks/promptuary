@@ -1,3 +1,0 @@
-version: 1
-start:
-  command: ["node", "dist/index.js", "--transport=stdio", "--quiet"]

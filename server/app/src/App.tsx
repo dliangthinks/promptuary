@@ -10,13 +10,14 @@ import { useContextMenu } from "./hooks/useContextMenu.js";
 import type { Prompt, ViewState } from "./types.js";
 
 interface AppProps {
-  app: McpApp;
+  app: McpApp | null;
   toolResult: CallToolResult | null;
+  restMode: boolean;
 }
 
 type Theme = "system" | "light" | "dark";
 
-export function App({ app, toolResult }: AppProps) {
+export function App({ app, toolResult, restMode }: AppProps) {
   const [viewState, setViewState] = useState<ViewState>({ view: "grid" });
   const [theme, setTheme] = useState<Theme>("system");
 
@@ -33,6 +34,10 @@ export function App({ app, toolResult }: AppProps) {
     setTheme((t) => (t === "system" ? "light" : t === "light" ? "dark" : "system"));
   }, []);
 
+  const handleExpand = useCallback(() => {
+    app?.openLink({ url: "http://localhost:9090/" });
+  }, [app]);
+
   const {
     prompts,
     categories,
@@ -40,7 +45,7 @@ export function App({ app, toolResult }: AppProps) {
     searchTerm,
     setSearchTerm,
     refresh,
-  } = usePromptData(app);
+  } = usePromptData(app, restMode);
   const { menu, show: showContextMenu, showCategory: showCategoryContextMenu, hide: hideContextMenu } = useContextMenu();
 
   const handleEdit = useCallback((prompt: Prompt) => {
@@ -86,30 +91,46 @@ export function App({ app, toolResult }: AppProps) {
     }
 
     try {
-      await app.callServerTool({
-        name: "create_category",
-        arguments: { name, after: afterId },
-      });
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/tools/create_category`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: name.toLowerCase().replace(/\s+/g, "-"), name, description: name }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        await app.callServerTool({
+          name: "create_category",
+          arguments: { name, after: afterId },
+        });
+      }
       await refresh();
       setRenamingCategoryId(name);
     } catch (e) {
       console.error("Add category failed:", e);
     }
-  }, [app, menu.categoryId, categories, hideContextMenu, refresh]);
+  }, [app, restMode, menu.categoryId, categories, hideContextMenu, refresh]);
 
   const handleDeleteCategory = useCallback(async () => {
     if (!menu.categoryId) return;
     hideContextMenu();
     try {
-      await app.callServerTool({
-        name: "delete_category",
-        arguments: { name: menu.categoryId },
-      });
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/categories/${menu.categoryId}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        await app.callServerTool({
+          name: "delete_category",
+          arguments: { name: menu.categoryId },
+        });
+      }
       refresh();
     } catch (e) {
       console.error("Delete category failed:", e);
     }
-  }, [app, menu.categoryId, hideContextMenu, refresh]);
+  }, [app, restMode, menu.categoryId, hideContextMenu, refresh]);
 
   const [renamingCategoryId, setRenamingCategoryId] = useState<string | null>(null);
 
@@ -118,27 +139,45 @@ export function App({ app, toolResult }: AppProps) {
     const currentName = categories.find((c) => c.id === categoryId)?.name ?? categoryId;
     if (!newName || newName === currentName) return;
     try {
-      await app.callServerTool({
-        name: "rename_category",
-        arguments: { name: categoryId, new_name: newName },
-      });
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/categories/${categoryId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: newName }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        await app.callServerTool({
+          name: "rename_category",
+          arguments: { name: categoryId, new_name: newName },
+        });
+      }
       refresh();
     } catch (e) {
       console.error("Rename category failed:", e);
     }
-  }, [app, categories, refresh]);
+  }, [app, restMode, categories, refresh]);
 
   const handleMovePrompt = useCallback(async (promptId: string, targetCategory: string) => {
     try {
-      await app.callServerTool({
-        name: "move_prompt",
-        arguments: { id: promptId, target_category: targetCategory },
-      });
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/prompts/${promptId}/move`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_category: targetCategory }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        await app.callServerTool({
+          name: "move_prompt",
+          arguments: { id: promptId, target_category: targetCategory },
+        });
+      }
       refresh();
     } catch (e) {
       console.error("Move failed:", e);
     }
-  }, [app, refresh]);
+  }, [app, restMode, refresh]);
 
   const handleDelete = useCallback(async () => {
     if (!menu.promptId) return;
@@ -146,15 +185,22 @@ export function App({ app, toolResult }: AppProps) {
     if (!prompt) return;
     hideContextMenu();
     try {
-      await app.callServerTool({
-        name: "delete_prompt",
-        arguments: { id: prompt.id },
-      });
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/prompts/${prompt.id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        await app.callServerTool({
+          name: "delete_prompt",
+          arguments: { id: prompt.id },
+        });
+      }
       refresh();
     } catch (e) {
       console.error("Delete failed:", e);
     }
-  }, [app, menu.promptId, prompts, hideContextMenu, refresh]);
+  }, [app, restMode, menu.promptId, prompts, hideContextMenu, refresh]);
 
   const contextPrompt = prompts.find((p) => p.id === menu.promptId);
 
@@ -165,6 +211,7 @@ export function App({ app, toolResult }: AppProps) {
         prompt={viewState.prompt}
         onBack={handleBack}
         onDeleted={handleDeleted}
+        restMode={restMode}
       />
     );
   }
@@ -178,6 +225,8 @@ export function App({ app, toolResult }: AppProps) {
         loading={loading}
         theme={theme}
         onToggleTheme={cycleTheme}
+        restMode={restMode}
+        onExpand={handleExpand}
       />
       {loading ? (
         <div className="loading-state">Loading prompts...</div>

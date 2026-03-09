@@ -4,7 +4,6 @@
  */
 
 import { Logger } from "../logging/index.js";
-import { TextReferenceManager } from "../text-references/index.js";
 import { getAvailableTools } from "../utils/index.js";
 import { processTemplate as originalProcessTemplate } from "../utils/jsonUtils.js";
 
@@ -13,11 +12,9 @@ import { processTemplate as originalProcessTemplate } from "../utils/jsonUtils.j
  */
 export class TemplateProcessor {
   private logger: Logger;
-  private textReferenceManager: TextReferenceManager;
 
-  constructor(logger: Logger, textReferenceManager: TextReferenceManager) {
+  constructor(logger: Logger) {
     this.logger = logger;
-    this.textReferenceManager = textReferenceManager;
   }
 
   /**
@@ -30,32 +27,16 @@ export class TemplateProcessor {
     toolsEnabled: boolean = false
   ): Promise<string> {
     try {
-      // First, store any long text arguments as references
-      const processedArgs = { ...args };
-      for (const [key, value] of Object.entries(processedArgs)) {
-        if (value && value.length > 500) {
-          // Store texts longer than 500 characters as references
-          processedArgs[key] =
-            await this.textReferenceManager.storeTextReference(value);
-        }
-      }
-
-      // Add tools_available to specialContext if tools are enabled
       const enhancedSpecialContext = { ...specialContext };
       if (toolsEnabled) {
         enhancedSpecialContext["tools_available"] = getAvailableTools();
       }
 
-      // Process the template with the modified arguments
-      let processedTemplate = originalProcessTemplate(
+      const processedTemplate = originalProcessTemplate(
         template,
-        processedArgs,
+        args,
         enhancedSpecialContext
       );
-
-      // Replace any reference placeholders with their content
-      processedTemplate =
-        this.textReferenceManager.processTemplateReferences(processedTemplate);
 
       return processedTemplate;
     } catch (error) {
@@ -81,15 +62,11 @@ export class TemplateProcessor {
       }
 
       // Process the template with the arguments directly
-      let processedTemplate = originalProcessTemplate(
+      const processedTemplate = originalProcessTemplate(
         template,
         args,
         enhancedSpecialContext
       );
-
-      // Replace any reference placeholders with their content
-      processedTemplate =
-        this.textReferenceManager.processTemplateReferences(processedTemplate);
 
       return processedTemplate;
     } catch (error) {
@@ -201,10 +178,7 @@ export class TemplateProcessor {
       "step_name",
     ];
 
-    return (
-      specialPlaceholders.includes(placeholder) ||
-      placeholder.startsWith("ref:")
-    );
+    return specialPlaceholders.includes(placeholder);
   }
 
   /**
@@ -268,16 +242,7 @@ export class TemplateProcessor {
     longTextArguments: string[];
     placeholdersUsed: string[];
   } {
-    const longTextArguments: string[] = [];
-
-    // Identify long text arguments that would be stored as references
-    for (const [key, value] of Object.entries(args)) {
-      if (value && value.length > 500) {
-        longTextArguments.push(key);
-      }
-    }
-
-    // Process template without storing references
+    // Process template
     const enhancedSpecialContext = { ...specialContext };
     if (toolsEnabled) {
       enhancedSpecialContext["tools_available"] = getAvailableTools();
@@ -293,7 +258,7 @@ export class TemplateProcessor {
 
     return {
       processedTemplate,
-      longTextArguments,
+      longTextArguments: [],
       placeholdersUsed,
     };
   }

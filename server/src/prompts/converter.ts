@@ -57,9 +57,6 @@ export class PromptConverter {
             description: arg.description,
             required: arg.required,
           })),
-          // Include chain information if this is a chain
-          isChain: promptFile.isChain || false,
-          chainSteps: promptFile.chainSteps || [],
           tools: promptData.tools || false,
           onEmptyInvocation:
             promptData.onEmptyInvocation || "execute_if_possible",
@@ -124,28 +121,8 @@ export class PromptConverter {
       errors.push("Missing required field: category");
     }
 
-    // Check that either userMessageTemplate exists or it's a valid chain
-    if (!prompt.userMessageTemplate && !prompt.isChain) {
-      errors.push(
-        "Either userMessageTemplate must be provided or prompt must be a valid chain"
-      );
-    }
-
-    // Validate chain prompts
-    if (prompt.isChain) {
-      if (!prompt.chainSteps || prompt.chainSteps.length === 0) {
-        errors.push("Chain prompt must have at least one chain step");
-      } else {
-        // Validate each chain step
-        prompt.chainSteps.forEach((step, index) => {
-          if (!step.promptId) {
-            errors.push(`Chain step ${index + 1} missing promptId`);
-          }
-          if (!step.stepName) {
-            errors.push(`Chain step ${index + 1} missing stepName`);
-          }
-        });
-      }
+    if (!prompt.userMessageTemplate) {
+      errors.push("Missing required field: userMessageTemplate");
     }
 
     // Validate arguments
@@ -253,8 +230,8 @@ export class PromptConverter {
     regularPrompts: number;
     totalArguments: number;
   } {
-    const chainPrompts = convertedPrompts.filter((p) => p.isChain).length;
-    const regularPrompts = convertedPrompts.length - chainPrompts;
+    const chainPrompts = 0;
+    const regularPrompts = convertedPrompts.length;
     const totalArguments = convertedPrompts.reduce(
       (sum, p) => sum + p.arguments.length,
       0

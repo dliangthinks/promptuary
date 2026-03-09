@@ -3,13 +3,14 @@ import type { App } from "@modelcontextprotocol/ext-apps";
 import type { Prompt } from "../types.js";
 
 interface EditViewProps {
-  app: App;
+  app: App | null;
   prompt: Prompt;
   onBack: () => void;
   onDeleted: () => void;
+  restMode: boolean;
 }
 
-export function EditView({ app, prompt, onBack, onDeleted }: EditViewProps) {
+export function EditView({ app, prompt, onBack, onDeleted, restMode }: EditViewProps) {
   const [name, setName] = useState(prompt.name);
   const [content, setContent] = useState(prompt.content || "");
   const [description, setDescription] = useState(prompt.description || "");
@@ -22,13 +23,20 @@ export function EditView({ app, prompt, onBack, onDeleted }: EditViewProps) {
     if (prompt.content) return;
     (async () => {
       try {
-        const result = await app.callServerTool({
-          name: "read_prompt",
-          arguments: { id: prompt.id },
-        });
-        const text = result.content?.find((c) => c.type === "text");
-        if (text && "text" in text) {
-          setContent(text.text);
+        if (restMode) {
+          const res = await fetch(`${window.location.origin}/api/v1/prompts/${prompt.id}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          setContent(data.content || "");
+        } else if (app) {
+          const result = await app.callServerTool({
+            name: "read_prompt",
+            arguments: { id: prompt.id },
+          });
+          const text = result.content?.find((c) => c.type === "text");
+          if (text && "text" in text) {
+            setContent(text.text);
+          }
         }
       } catch (e) {
         console.error("Failed to load prompt content:", e);
@@ -36,24 +44,33 @@ export function EditView({ app, prompt, onBack, onDeleted }: EditViewProps) {
         setLoadingContent(false);
       }
     })();
-  }, [app, prompt]);
+  }, [app, prompt, restMode]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     setSaved(false);
     try {
-      const args: Record<string, string> = {
-        name: prompt.name,
-        content,
-        description,
-      };
-      if (name !== prompt.name) {
-        args.new_name = name;
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/prompts/${prompt.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        const args: Record<string, string> = {
+          name: prompt.name,
+          content,
+          description,
+        };
+        if (name !== prompt.name) {
+          args.new_name = name;
+        }
+        await app.callServerTool({
+          name: "update_prompt",
+          arguments: args,
+        });
       }
-      await app.callServerTool({
-        name: "update_prompt",
-        arguments: args,
-      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
@@ -61,19 +78,26 @@ export function EditView({ app, prompt, onBack, onDeleted }: EditViewProps) {
     } finally {
       setSaving(false);
     }
-  }, [app, prompt.name, name, content, description]);
+  }, [app, restMode, prompt.id, prompt.name, name, content, description]);
 
   const handleDelete = useCallback(async () => {
     try {
-      await app.callServerTool({
-        name: "delete_prompt",
-        arguments: { id: prompt.id },
-      });
+      if (restMode) {
+        const res = await fetch(`${window.location.origin}/api/v1/prompts/${prompt.id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else if (app) {
+        await app.callServerTool({
+          name: "delete_prompt",
+          arguments: { id: prompt.id },
+        });
+      }
       onDeleted();
     } catch (e) {
       console.error("Delete failed:", e);
     }
-  }, [app, prompt.name, onDeleted]);
+  }, [app, restMode, prompt.id, prompt.name, onDeleted]);
 
   return (
     <div className="detail-view">

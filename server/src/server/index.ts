@@ -107,7 +107,7 @@ export class ServerManager {
 
     // Start listening
     await new Promise<void>((resolve, reject) => {
-      this.httpServer!.listen(this.port, () => {
+      this.httpServer!.listen(this.port, "127.0.0.1", () => {
         this.logger.info(
           `Promptuary running on http://localhost:${this.port}`
         );
@@ -120,7 +120,7 @@ export class ServerManager {
       this.httpServer!.on("error", (error: any) => {
         if (error.code === "EADDRINUSE") {
           this.logger.error(
-            `Port ${this.port} is already in use. Please choose a different port or stop the other service.`
+            `Port ${this.port} is already in use. Set a different port in config.json or use the PORT environment variable.`
           );
         } else {
           this.logger.error("Server error:", error);
@@ -148,7 +148,7 @@ export class ServerManager {
     this.setupHttpServerEventHandlers();
 
     await new Promise<void>((resolve, reject) => {
-      this.httpServer!.listen(this.port, () => {
+      this.httpServer!.listen(this.port, "127.0.0.1", () => {
         this.logger.info(
           `Promptuary viewer available at http://localhost:${this.port}/viewer`
         );
@@ -160,13 +160,15 @@ export class ServerManager {
 
       this.httpServer!.on("error", (error: any) => {
         if (error.code === "EADDRINUSE") {
-          this.logger.error(
-            `Port ${this.port} is already in use. Unable to start viewer HTTP server.`
+          this.logger.warn(
+            `Port ${this.port} is already in use. Viewer HTTP server will not be started. STDIO transport will continue normally.`
           );
+          this.httpServer = undefined;
+          resolve(); // Don't crash — viewer is optional in STDIO mode
         } else {
           this.logger.error("Viewer server error:", error);
+          reject(error);
         }
-        reject(error);
       });
     });
   }

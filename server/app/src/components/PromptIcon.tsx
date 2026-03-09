@@ -37,6 +37,15 @@ export function PromptIcon({
         {prompt.description && (
           <div className="prompt-card-description">{prompt.description}</div>
         )}
+        {prompt.arguments && prompt.arguments.length > 0 && (
+          <div className="prompt-card-args">
+            {prompt.arguments.map((arg) => (
+              <span key={arg.name} className="prompt-card-arg-badge">
+                {arg.name}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -299,13 +299,6 @@ export class PromptLoader {
   ): Promise<{
     systemMessage?: string;
     userMessageTemplate: string;
-    isChain?: boolean;
-    chainSteps?: Array<{
-      promptId: string;
-      stepName: string;
-      inputMapping?: Record<string, string>;
-      outputMapping?: Record<string, string>;
-    }>;
   }> {
     try {
       const fullPath = path.join(basePath, filePath);
@@ -326,103 +319,11 @@ export class PromptLoader {
         ? userMessageMatch[1].trim()
         : "";
 
-      // Extract chain information if present
-      const chainMatch = content.match(
-        /## Chain Steps\s*\n([\s\S]*?)(?=\n##|$)/
-      );
-      let isChain = false;
-      let chainSteps: Array<{
-        promptId: string;
-        stepName: string;
-        inputMapping?: Record<string, string>;
-        outputMapping?: Record<string, string>;
-      }> = [];
-
-      if (chainMatch) {
-        isChain = true;
-        const chainContent = chainMatch[1].trim();
-        // Updated regex to match the current markdown format
-        const stepMatches = chainContent.matchAll(
-          /(\d+)\.\s*promptId:\s*([^\n]+)\s*\n\s*stepName:\s*([^\n]+)(?:\s*\n\s*inputMapping:\s*([\s\S]*?)(?=\s*\n\s*(?:outputMapping|promptId|\d+\.|$)))?\s*(?:\n\s*outputMapping:\s*([\s\S]*?)(?=\s*\n\s*(?:promptId|\d+\.|$)))?\s*/g
-        );
-
-        for (const match of stepMatches) {
-          const [
-            _,
-            stepNumber,
-            promptId,
-            stepName,
-            inputMappingStr,
-            outputMappingStr,
-          ] = match;
-
-          const step: {
-            promptId: string;
-            stepName: string;
-            inputMapping?: Record<string, string>;
-            outputMapping?: Record<string, string>;
-          } = {
-            promptId: promptId.trim(),
-            stepName: stepName.trim(),
-          };
-
-          if (inputMappingStr) {
-            try {
-              // Parse YAML-style mapping into JSON object
-              const inputMapping: Record<string, string> = {};
-              const lines = inputMappingStr.trim().split("\n");
-              for (const line of lines) {
-                const [key, value] = line
-                  .trim()
-                  .split(":")
-                  .map((s) => s.trim());
-                if (key && value) {
-                  inputMapping[key] = value;
-                }
-              }
-              step.inputMapping = inputMapping;
-            } catch (e) {
-              this.logger.warn(
-                `Invalid input mapping in chain step ${stepNumber} of ${filePath}: ${e}`
-              );
-            }
-          }
-
-          if (outputMappingStr) {
-            try {
-              // Parse YAML-style mapping into JSON object
-              const outputMapping: Record<string, string> = {};
-              const lines = outputMappingStr.trim().split("\n");
-              for (const line of lines) {
-                const [key, value] = line
-                  .trim()
-                  .split(":")
-                  .map((s) => s.trim());
-                if (key && value) {
-                  outputMapping[key] = value;
-                }
-              }
-              step.outputMapping = outputMapping;
-            } catch (e) {
-              this.logger.warn(
-                `Invalid output mapping in chain step ${stepNumber} of ${filePath}: ${e}`
-              );
-            }
-          }
-
-          chainSteps.push(step);
-        }
-
-        this.logger.debug(
-          `Loaded chain with ${chainSteps.length} steps from ${filePath}`
-        );
-      }
-
-      if (!userMessageTemplate && !isChain) {
+      if (!userMessageTemplate) {
         throw new Error(`No user message template found in ${filePath}`);
       }
 
-      return { systemMessage, userMessageTemplate, isChain, chainSteps };
+      return { systemMessage, userMessageTemplate };
     } catch (error) {
       this.logger.error(`Error loading prompt file ${filePath}:`, error);
       throw error;

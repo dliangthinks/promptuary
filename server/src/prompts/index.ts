@@ -11,7 +11,6 @@ export * from "./template-processor.js";
 
 import { ConfigManager } from "../config/index.js";
 import { Logger } from "../logging/index.js";
-import { TextReferenceManager } from "../text-references/index.js";
 import {
   Category,
   CategoryPromptsResult,
@@ -30,7 +29,6 @@ import { TemplateProcessor } from "./template-processor.js";
  */
 export class PromptManager {
   private logger: Logger;
-  private textReferenceManager: TextReferenceManager;
   private configManager: ConfigManager;
   private mcpServer: any;
 
@@ -42,21 +40,16 @@ export class PromptManager {
 
   constructor(
     logger: Logger,
-    textReferenceManager: TextReferenceManager,
     configManager: ConfigManager,
     mcpServer?: any
   ) {
     this.logger = logger;
-    this.textReferenceManager = textReferenceManager;
     this.configManager = configManager;
     this.mcpServer = mcpServer;
 
     // Initialize individual modules
     this.loader = new PromptLoader(logger);
-    this.templateProcessor = new TemplateProcessor(
-      logger,
-      textReferenceManager
-    );
+    this.templateProcessor = new TemplateProcessor(logger);
     this.converter = new PromptConverter(logger, this.loader);
 
     if (mcpServer) {
@@ -288,7 +281,6 @@ export class PromptManager {
    */
   getStats(prompts?: ConvertedPrompt[]) {
     const stats: any = {
-      textReferences: this.textReferenceManager.getStats(),
     };
 
     if (prompts && this.registry) {

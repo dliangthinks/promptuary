@@ -1,0 +1,26 @@
+# App build-time dependencies (already compiled into app/dist/index.html)
+server/app/node_modules/
+server/app/src/
+
+# Source TypeScript (already compiled into server/dist/)
+server/src/
+
+# Dev-only dependencies (not needed at runtime)
+server/node_modules/typescript/
+server/node_modules/@types/
+
+# Git and editor
+.git/
+.claude/
+.cursor/
+.vscode/
+.idea/
+.DS_Store
+
+# Dev files
+server/logs/
+server/.env*
+server/test-server.js
+server/test-listprompts.mjs
+*.dmp
+*.log

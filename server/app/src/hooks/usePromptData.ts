@@ -2,13 +2,59 @@ import { useState, useEffect, useCallback } from "react";
 import type { App } from "@modelcontextprotocol/ext-apps";
 import type { Prompt, Category } from "../types.js";
 
-export function usePromptData(app: App | null) {
+export function usePromptData(app: App | null, restMode: boolean = false) {
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   const loadPrompts = useCallback(async () => {
+    if (restMode) {
+      setLoading(true);
+      try {
+        const res = await fetch(`${window.location.origin}/prompts`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        // Build ID→name lookup so prompts use display names
+        const idToName: Record<string, string> = {};
+        for (const c of data.categories || []) {
+          idToName[c.id] = c.name;
+        }
+        const cats: Category[] = (data.categories || []).map(
+          (c: { id: string; name: string; description?: string }) => ({
+            name: c.name,
+            description: c.description,
+            promptCount: (data.prompts || []).filter(
+              (p: { category?: string }) => p.category === c.id
+            ).length,
+          })
+        );
+        const proms: Prompt[] = (data.prompts || []).map(
+          (p: {
+            id: string;
+            name: string;
+            category?: string;
+            description?: string;
+            arguments?: Prompt["arguments"];
+            file?: string;
+          }) => ({
+            id: p.id,
+            name: p.name,
+            category: p.category ? (idToName[p.category] || p.category) : p.category,
+            description: p.description,
+            arguments: p.arguments,
+          })
+        );
+        setPrompts(proms);
+        setCategories(cats);
+      } catch (e) {
+        console.error("Failed to load prompts via REST:", e);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!app) return;
     setLoading(true);
     try {
@@ -27,7 +73,7 @@ export function usePromptData(app: App | null) {
     } finally {
       setLoading(false);
     }
-  }, [app]);
+  }, [app, restMode]);
 
   useEffect(() => {
     loadPrompts();
@@ -104,8 +150,8 @@ function parsePromptList(text: string): {
       continue;
     }
 
-    // Prompt header: "### ⚙️ /prompt_id 🟡" or "### 📄 /prompt_id 🟢"
-    const promptMatch = trimmed.match(/^### .+?\s+\/(\S+)/);
+    // Prompt header: "### /prompt_id" or "### ⚙️ /prompt_id 🟡"
+    const promptMatch = trimmed.match(/^### .*\/(\S+)/);
     if (promptMatch && currentCategory) {
       const id = promptMatch[1];
       currentPrompt = {

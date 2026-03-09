@@ -10,7 +10,6 @@ import { z } from "zod";
 import { ConfigManager } from "../config/index.js";
 import { Logger } from "../logging/index.js";
 import { safeWriteFile } from "../prompts/promptUtils.js";
-import { SemanticAnalyzer, PromptClassification } from "../utils/semanticAnalyzer.js";
 import {
   ConvertedPrompt,
   PromptData,
@@ -26,7 +25,6 @@ export class PromptManagementTools {
   private configManager: ConfigManager;
   private promptsData: PromptData[] = [];
   private convertedPrompts: ConvertedPrompt[] = [];
-  private semanticAnalyzer: SemanticAnalyzer;
   private onRefresh: () => Promise<void>;
   private onRestart: (reason: string) => Promise<void>;
 
@@ -40,7 +38,6 @@ export class PromptManagementTools {
     this.logger = logger;
     this.mcpServer = mcpServer;
     this.configManager = configManager;
-    this.semanticAnalyzer = new SemanticAnalyzer();
     this.onRefresh = onRefresh;
     this.onRestart = onRestart;
   }
@@ -54,60 +51,6 @@ export class PromptManagementTools {
   ): void {
     this.promptsData = promptsData;
     this.convertedPrompts = convertedPrompts;
-  }
-
-  /**
-   * Analyze a prompt and generate intelligent feedback
-   */
-  private analyzePromptIntelligence(promptData: PromptData, userMessageTemplate: string, systemMessage?: string, isChain?: boolean, chainSteps?: any[]): {
-    classification: PromptClassification;
-    feedback: string;
-    suggestions: string[];
-  } {
-    // Create a temporary ConvertedPrompt for analysis
-    const tempPrompt: ConvertedPrompt = {
-      id: promptData.id,
-      name: promptData.name,
-      description: promptData.description,
-      category: promptData.category,
-      systemMessage,
-      userMessageTemplate,
-      arguments: promptData.arguments || [],
-      isChain: isChain || false,
-      chainSteps: chainSteps || []
-    };
-
-    const classification = this.semanticAnalyzer.analyzePrompt(tempPrompt);
-    
-    // Generate intelligent feedback
-    const confidence = Math.round(classification.confidence * 100);
-    let feedback = `🧠 **Intelligent Analysis**: ${classification.executionType} (${confidence}% confidence)\n`;
-    feedback += `⚡ **Execution Required**: ${classification.requiresExecution ? 'Yes' : 'No'}\n`;
-    
-    if (classification.suggestedGates.length > 0) {
-      feedback += `🛡️ **Auto-assigned Gates**: ${classification.suggestedGates.join(', ')}\n`;
-    }
-
-    // Generate suggestions for improvement
-    const suggestions: string[] = [];
-    
-    if (classification.confidence < 0.7) {
-      suggestions.push("Consider adding more structured language to improve execution confidence");
-    }
-    
-    if (classification.confidence < 0.5) {
-      suggestions.push("Add framework or systematic approach keywords for better detection");
-    }
-    
-    if (classification.requiresExecution && !userMessageTemplate.toLowerCase().includes('step')) {
-      suggestions.push("Consider adding step-by-step structure for clearer execution guidance");
-    }
-    
-    if (promptData.arguments.length > 3 && classification.confidence < 0.8) {
-      suggestions.push("Complex prompts benefit from clear section headers and structured templates");
-    }
-
-    return { classification, feedback, suggestions };
   }
 
   /**
@@ -529,32 +472,6 @@ export class PromptManagementTools {
     }
 
     promptFileContent += `## User Message Template\n${args.userMessageTemplate}\n`;
-
-    // Add chain steps if present
-    if (args.isChain && args.chainSteps && args.chainSteps.length > 0) {
-      promptFileContent += `\n## Chain Steps\n\n`;
-
-      args.chainSteps.forEach((step: any, index: number) => {
-        promptFileContent += `${index + 1}. promptId: ${step.promptId}\n`;
-        promptFileContent += `   stepName: ${step.stepName}\n`;
-
-        if (step.inputMapping) {
-          promptFileContent += `   inputMapping:\n`;
-          for (const [key, value] of Object.entries(step.inputMapping)) {
-            promptFileContent += `     ${key}: ${value}\n`;
-          }
-        }
-
-        if (step.outputMapping) {
-          promptFileContent += `   outputMapping:\n`;
-          for (const [key, value] of Object.entries(step.outputMapping)) {
-            promptFileContent += `     ${key}: ${value}\n`;
-          }
-        }
-
-        promptFileContent += `\n`;
-      });
-    }
 
     // Write prompt file
     await safeWriteFile(fullPromptFilePath, promptFileContent, "utf8");

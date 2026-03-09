@@ -2,8 +2,8 @@
   "dxt_version": "0.1",
   "name": "promptuary",
   "display_name": "Promptuary",
-  "version": "1.0.0",
-  "description": "Intelligent prompt management system, view and edit prompts at http://localhost:9090/viewer/",
+  "version": "2.0.0",
+  "description": "Interactive prompt management system",
   "author": {
     "name": "Dong Liang"  
    },
