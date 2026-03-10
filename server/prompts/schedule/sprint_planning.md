@@ -100,6 +100,10 @@ Use filesystem tools to create sprint planning documentation.
 
 I'll help you plan an effective sprint by calculating team capacity, defining a clear sprint goal, and selecting the right backlog items to achieve your objectives.
 
+{% if sprint_number %}
+**Sprint:** {{sprint_number}}
+{% else %}
 **What sprint are you planning?**
+{% endif %}
 
-Share your sprint number, team composition, and any relevant context. I'll guide you through comprehensive sprint planning.
+Share your team composition and any relevant context. I'll guide you through comprehensive sprint planning.

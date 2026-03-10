@@ -171,11 +171,16 @@ Use filesystem tools to create stakeholder identification and mapping documentat
 
 I'll help you systematically identify all project stakeholders, analyze their power, interest, and influence, and create visual stakeholder maps to guide engagement strategies.
 
+{% if project_context %}
+**Project Context:**
+{{project_context}}
+{% else %}
 **What project are you identifying stakeholders for?**
 
 Share:
 - Project overview and objectives
 - Known stakeholders (if any)
 - Organizational context
+{% endif %}
 
 I'll guide you through comprehensive stakeholder identification and mapping with strategic analysis.

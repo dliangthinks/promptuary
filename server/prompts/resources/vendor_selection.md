@@ -223,6 +223,15 @@ Use filesystem tools to create vendor selection documentation including evaluati
 
 I'll help you develop a comprehensive, objective vendor evaluation framework with clear criteria, weights, and scoring methodology to select the best vendor for your needs.
 
+{% if procurement_type %}
+**Procurement type:** {{procurement_type}}
+
+Share information about:
+- Key requirements and priorities
+- Selection constraints or preferences
+
+I'll guide you through creating a thorough vendor evaluation and selection process for this {{procurement_type}} procurement.
+{% else %}
 **What are you procuring?**
 
 Share information about:
@@ -231,3 +240,4 @@ Share information about:
 - Selection constraints or preferences
 
 I'll guide you through creating a thorough vendor evaluation and selection process.
+{% endif %}

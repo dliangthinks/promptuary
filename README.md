@@ -12,6 +12,16 @@ An MCP server for managing and executing AI prompt templates. Includes a built-i
 
 </div>
 
+## Why "Promptuary"?
+
+> **promptuary** _(noun)_ promp·​tu·​ary ˈprämpchəˌwerē
+> 1. _obsolete_ : storehouse, repository
+> 2. : a book of ready reference
+
+If you use AI daily, you've built up prompts that work — for code reviews, writing, analysis, project planning. But without a dedicated tool, reusing them is painful. They end up scattered across chat histories, text files, and sticky notes. You re-type them from memory, losing the wording that made them effective. You can't share them across projects or tweak variables without copy-pasting the whole thing.
+
+Promptuary is a prompt library that lives where you already work. It runs as an MCP server inside Claude Desktop, so your prompts are always one tool call away — browsable, searchable, executable with argument substitution, and editable without leaving the conversation.
+
 ## Quick Start
 
 ```bash

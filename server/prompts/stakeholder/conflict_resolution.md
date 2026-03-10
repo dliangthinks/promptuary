@@ -258,6 +258,15 @@ Use filesystem tools to create conflict resolution documentation.
 
 I'll help you navigate conflict resolution with a structured approach to understand root causes, facilitate productive dialogue, and reach mutually acceptable solutions.
 
+{% if conflict_description %}
+**Conflict Description:**
+{{conflict_description}}
+
+Share any additional details:
+- Parties involved
+- Impact on the project
+- Previous resolution attempts (if any)
+{% else %}
 **What conflict needs to be resolved?**
 
 Share:
@@ -265,5 +274,6 @@ Share:
 - Parties involved
 - Impact on the project
 - Previous resolution attempts (if any)
+{% endif %}
 
 I'll guide you through a systematic conflict resolution process with specific techniques and documentation.

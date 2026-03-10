@@ -28,6 +28,12 @@ Generate actual files using filesystem tools.
 
 Welcome! I'll guide you through a structured project discovery process.
 
+{% if project_idea %}
+**Project Idea:** {{project_idea}}
+
+I'll ask targeted questions to understand the project scope, then gather key project management details before creating comprehensive documentation.
+{% else %}
 **What's your project idea?**
 
 Share your initial concept, and I'll ask targeted questions to understand the project scope, then gather key project management details before creating comprehensive documentation.
+{% endif %}

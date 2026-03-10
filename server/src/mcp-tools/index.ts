@@ -199,7 +199,18 @@ export class McpToolsManager {
     if (isJsonFormat) {
       // Handle JSON format (advanced usage)
       try {
-        const parsedArgs = JSON.parse(trimmedArgs);
+        // Sanitize raw control characters (newlines, tabs, etc.) that Claude
+        // embeds in JSON string values when sending multiline content like transcripts.
+        // Already-escaped sequences like \\n are two chars and won't match \x0a.
+        const sanitized = trimmedArgs.replace(/[\x00-\x1f]/g, (c) => {
+          switch (c) {
+            case '\n': return '\\n';
+            case '\r': return '\\r';
+            case '\t': return '\\t';
+            default: return '';
+          }
+        });
+        const parsedArgs = JSON.parse(sanitized);
         const validation = validateJsonArguments(parsedArgs, matchingPrompt);
 
         if (!validation.valid && validation.errors) {

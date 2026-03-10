@@ -167,6 +167,12 @@ Use filesystem tools to create risk monitoring report in appropriate format.
 
 I'll help you create a comprehensive risk monitoring report that tracks risk status, response effectiveness, trends, and provides actionable insights for stakeholders.
 
+{% if reporting_period %}
+**Reporting Period:** {{reporting_period}}
+
+Share your current risk data and any changes since the last report, and I'll generate a complete risk monitoring report with analysis and recommendations for this period.
+{% else %}
 **What reporting period are you covering?**
 
 Share your current risk data and any changes since the last report, and I'll generate a complete risk monitoring report with analysis and recommendations.
+{% endif %}

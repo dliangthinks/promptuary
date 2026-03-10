@@ -124,9 +124,15 @@ Use filesystem tools to create financial status report documentation.
 
 I'll help you create a comprehensive financial status report that clearly communicates project cost performance, variances, forecasts, and financial health to stakeholders.
 
+{% if reporting_period %}
+**Reporting Period:** {{reporting_period}}
+
+Share your financial data for this period:
+{% else %}
 **What reporting period are you covering?**
 
 Share your financial data:
+{% endif %}
 - Budget information
 - Actual costs to date
 - Work completed (for EVM)

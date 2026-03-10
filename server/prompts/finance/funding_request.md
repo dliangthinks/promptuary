@@ -158,10 +158,19 @@ I'll help you create a compelling, well-justified funding request that clearly a
 
 **What are you requesting funding for?**
 
+{% if funding_amount %}
+**Requested Amount:** {{funding_amount}}
+
+Share:
+- Purpose and objectives
+- Who will approve the request
+- Any cost or benefit information you have
+{% else %}
 Share:
 - Funding amount needed
 - Purpose and objectives
 - Who will approve the request
 - Any cost or benefit information you have
+{% endif %}
 
 I'll guide you through creating a comprehensive funding request package.

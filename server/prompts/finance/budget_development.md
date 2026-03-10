@@ -97,6 +97,12 @@ Use filesystem tools to create budget documentation with tables and charts.
 
 I'll help you develop a comprehensive project budget that consolidates all costs, establishes the cost baseline, calculates appropriate reserves, and presents funding requirements.
 
+{% if project_name %}
+**Project:** {{project_name}}
+
+Share the scope, duration, and any cost estimates you have for {{project_name}}, and I'll guide you through creating a complete project budget.
+{% else %}
 **What project are you budgeting for?**
 
 Share your project scope, duration, and any cost estimates you have, and I'll guide you through creating a complete project budget.
+{% endif %}

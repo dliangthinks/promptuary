@@ -88,6 +88,10 @@ Use filesystem tools to create schedule documentation. For tool files, provide s
 
 I'll help you develop a comprehensive project schedule with detailed activities, dependencies, resource assignments, and duration estimates.
 
+{% if project_name %}
+**Project:** {{project_name}}
+{% else %}
 **What project are you creating a schedule for?**
+{% endif %}
 
 Share project information and any WBS or scope documentation you have, and I'll guide you through building a complete project schedule.

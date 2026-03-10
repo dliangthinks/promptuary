@@ -103,6 +103,11 @@ Use filesystem tools to create change request documentation and update change lo
 
 I'll help you comprehensively evaluate a scope change request by analyzing impacts across all project dimensions and providing a clear recommendation.
 
+{% if change_description %}
+**Proposed Change:**
+{{change_description}}
+{% else %}
 **What change is being requested?**
 
 Provide the change description or context, and I'll guide you through a thorough impact analysis and recommendation process.
+{% endif %}

@@ -125,6 +125,15 @@ Use filesystem tools to create calendar documentation in various formats (Markdo
 
 I'll help you create comprehensive resource calendars that accurately reflect team availability, working hours, holidays, and time off for effective project scheduling.
 
+{% if time_period %}
+**Calendar period:** {{time_period}}
+
+Share any information you have about:
+- Team members and their roles
+- Standard working hours
+- Known holidays and time off
+- Work schedule variations
+{% else %}
 **What time period should the calendar cover?**
 
 Share the calendar timeframe and any information you have about:
@@ -132,5 +141,6 @@ Share the calendar timeframe and any information you have about:
 - Standard working hours
 - Known holidays and time off
 - Work schedule variations
+{% endif %}
 
 I'll create detailed resource calendars with capacity calculations.

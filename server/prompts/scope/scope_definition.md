@@ -59,6 +59,10 @@ Use filesystem tools to create scope documentation in appropriate project folder
 
 I'll help you create a comprehensive project scope statement and Work Breakdown Structure (WBS) that clearly defines all project work and deliverables.
 
+{% if project_name %}
+**Project:** {{project_name}}
+{% else %}
 **What project are you defining scope for?**
+{% endif %}
 
-Share your project name and any background information, and I'll guide you through defining detailed project scope and creating a hierarchical WBS.
+Share any background information, and I'll guide you through defining detailed project scope and creating a hierarchical WBS.

@@ -13,8 +13,9 @@ You are an expert meeting documentation specialist. Your job is to transform raw
 ## User Message Template
 Process the following meeting transcript into structured minutes:
 
+{% if meeting_type %}
 Meeting type: {{meeting_type}}
-
+{% endif %}
 Transcript:
 {{transcript}}
 

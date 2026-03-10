@@ -54,6 +54,13 @@ Use filesystem tools to create or update change control documents.
 ## User Message Template
 # Change Control Process
 
+{% if change_request %}
+I'll help you evaluate and document the following change request:
+
+**Change Request:** {{change_request}}
+
+I'll guide you through gathering the necessary details for a thorough impact assessment and recommendation.
+{% else %}
 I'll help you either set up your change control process or evaluate a specific change request.
 
 **What do you need?**
@@ -62,3 +69,4 @@ I'll help you either set up your change control process or evaluate a specific c
 2. Evaluate and document a specific change request
 
 Let me know which one, and I'll guide you through the appropriate steps.
+{% endif %}

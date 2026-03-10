@@ -205,6 +205,13 @@ Use filesystem tools to create risk identification documentation.
 
 I'll facilitate a comprehensive risk identification session using multiple techniques and categories to ensure we uncover all significant project risks.
 
+{% if project_context %}
+**Project Context:**
+{{project_context}}
+
+Based on this context, I'll guide you through a structured risk identification process to build a comprehensive risk list.
+{% else %}
 **What project are we identifying risks for?**
 
 Share your project context, objectives, and any known concerns. I'll guide you through a structured risk identification process to build a comprehensive risk list.
+{% endif %}

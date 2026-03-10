@@ -22,4 +22,4 @@ For each active project identified:
 - Any blockers or issues requiring attention
 - Recommended next steps
 
-Organize by priority level and provide a summary of overall project portfolio health. Focus on actionable insights rather than exhaustive details. {time_range}
+Organize by priority level and provide a summary of overall project portfolio health. Focus on actionable insights rather than exhaustive details.{% if time_range %} Focus on activity within the following time range: {{time_range}}.{% endif %}

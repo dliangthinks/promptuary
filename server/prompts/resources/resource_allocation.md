@@ -114,6 +114,12 @@ Use filesystem tools to create resource allocation documentation with tables and
 
 I'll help you create a comprehensive resource allocation plan that matches your available resources to project activities while optimizing utilization and identifying any gaps.
 
+{% if project_name %}
+**Project:** {{project_name}}
+
+Share information about this project's activities and available resources, and I'll guide you through creating an effective resource allocation plan.
+{% else %}
 **What project are you allocating resources for?**
 
 Share information about your project activities and available resources, and I'll guide you through creating an effective resource allocation plan.
+{% endif %}

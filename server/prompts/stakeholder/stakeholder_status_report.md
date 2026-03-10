@@ -186,10 +186,15 @@ Use filesystem tools to create stakeholder status report documentation.
 
 I'll help you create a stakeholder-focused status report that presents project information in the most relevant and actionable way for your specific audience.
 
+{% if audience %}
+**Target Audience:** {{audience}}
+{% else %}
 **Who is the audience for this report?**
 
+Specify the stakeholder type (executive, sponsor, team, users, etc.).
+{% endif %}
+
 Share:
-- Stakeholder type (executive, sponsor, team, users, etc.)
 - Reporting period
 - Current project status information
 - Key messages or concerns to communicate

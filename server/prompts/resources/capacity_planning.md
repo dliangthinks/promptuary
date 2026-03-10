@@ -155,11 +155,20 @@ Use filesystem tools to create capacity planning documentation with tables, char
 
 I'll help you analyze resource capacity against demand to identify over-allocations, under-utilization, and capacity gaps, then recommend optimization strategies.
 
+{% if time_period %}
+**Planning timeframe:** {{time_period}}
+
+Share information about:
+- Your team and their availability
+- Current and planned work commitments
+- Any known capacity concerns
+{% else %}
 **What timeframe are you planning for?**
 
 Share information about:
 - Your team and their availability
 - Current and planned work commitments
 - Any known capacity concerns
+{% endif %}
 
 I'll create a comprehensive capacity analysis with actionable recommendations.

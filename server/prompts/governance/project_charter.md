@@ -42,6 +42,12 @@ Generate the actual project charter using filesystem tools, saved in an appropri
 
 I'll help you create a comprehensive project charter that formally authorizes your project and documents key information for stakeholder alignment.
 
+{% if project_name %}
+**Project:** {{project_name}}
+
+I'll guide you through gathering all necessary information to create a complete project charter document for this project.
+{% else %}
 **What project would you like to create a charter for?**
 
 Share the project name or context, and I'll guide you through gathering all necessary information to create a complete project charter document.
+{% endif %}

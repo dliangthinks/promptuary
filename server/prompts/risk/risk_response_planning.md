@@ -186,6 +186,13 @@ Use filesystem tools to create risk response planning documentation.
 
 I'll help you develop comprehensive risk response strategies and action plans for your project risks, selecting the most appropriate strategy (avoid, mitigate, transfer, accept) for each risk.
 
+{% if risk_description %}
+**Risk to Address:**
+{{risk_description}}
+
+I'll guide you through developing effective, actionable risk response plans with contingencies and cost-benefit analysis for the above risk.
+{% else %}
 **Which risk(s) do you want to plan responses for?**
 
 Share your risk information, and I'll guide you through developing effective, actionable risk response plans with contingencies and cost-benefit analysis.
+{% endif %}

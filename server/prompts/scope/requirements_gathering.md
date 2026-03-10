@@ -71,6 +71,11 @@ Use filesystem tools to create requirements documentation.
 
 I'll help you systematically gather, document, and analyze project requirements from all stakeholders to ensure a complete and clear understanding of what needs to be delivered.
 
+{% if project_context %}
+**Project Context:**
+{{project_context}}
+{% else %}
 **What project are you gathering requirements for?**
 
 Share your project context, and I'll guide you through a comprehensive requirements elicitation and analysis process.
+{% endif %}

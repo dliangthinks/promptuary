@@ -130,7 +130,11 @@ Use filesystem tools to create cost estimation documentation.
 ## User Message Template
 # Cost Estimation
 
+{% if estimation_method %}
+I'll help you develop a detailed cost estimate using the **{{estimation_method}}** method based on available information and required accuracy level.
+{% else %}
 I'll help you develop a detailed cost estimate using appropriate estimation methods (bottom-up, analogous, parametric) based on available information and required accuracy level.
+{% endif %}
 
 **What are you estimating costs for?**
 
@@ -139,4 +143,8 @@ Share your project scope and let me know:
 - What information do you have available?
 - Do you have historical data from similar projects?
 
+{% if estimation_method %}
+I'll guide you through the **{{estimation_method}}** estimation approach.
+{% else %}
 I'll guide you through the most appropriate estimation approach.
+{% endif %}

@@ -81,6 +81,11 @@ Use filesystem tools to create backlog documentation in formats suitable for agi
 
 I'll help you create a well-structured and prioritized product backlog that clearly defines work items and supports effective sprint planning.
 
+{% if product_vision %}
+**Product Vision:**
+{{product_vision}}
+{% else %}
 **What product or project are you building a backlog for?**
 
 Share your product vision or context, and I'll guide you through creating a comprehensive, prioritized product backlog.
+{% endif %}
