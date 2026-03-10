@@ -30,3 +30,15 @@ Produce the following:
 7. **Next Steps** — next meeting or follow-up plan if mentioned
 
 Flag any items where the transcript is unclear or ownership is ambiguous.
+
+{% if meeting_type == "kickoff" %}
+Emphasize project objectives, scope agreements, role assignments, and ground rules established. The Meeting Summary should capture the project's purpose and success criteria.
+{% elif meeting_type == "status review" or meeting_type == "status" %}
+Emphasize progress against plan, schedule/budget variances, blockers requiring escalation, and upcoming milestones. Keep discussion points focused on deviations from baseline.
+{% elif meeting_type == "steering committee" %}
+Emphasize governance decisions, approvals granted, escalated issues resolved, and strategic direction changes. Decisions Made should be the most detailed section.
+{% elif meeting_type == "retrospective" or meeting_type == "retro" %}
+Emphasize what went well, what didn't, and improvement actions. Reframe Action Items as improvement commitments with owners.
+{% elif meeting_type == "sprint planning" %}
+Emphasize sprint goal, selected backlog items, capacity commitments, and identified risks to the sprint. Action Items should focus on sprint deliverables.
+{% endif %}

@@ -11,6 +11,11 @@
           "name": "project_name",
           "description": "Name of the project",
           "required": false
+        },
+        {
+          "name": "methodology",
+          "description": "Project methodology: predictive, agile, or hybrid",
+          "required": false
         }
       ]
     },
@@ -20,7 +25,13 @@
       "category": "resources",
       "description": "Define team structure and create RACI matrix for roles and responsibilities",
       "file": "team_structure.md",
-      "arguments": []
+      "arguments": [
+        {
+          "name": "methodology",
+          "description": "Project methodology: predictive, agile, or hybrid",
+          "required": false
+        }
+      ]
     },
     {
       "id": "capacity_planning",

@@ -159,4 +159,6 @@ I'll help you systematically assess each project risk for probability and impact
 
 **Do you have a list of identified risks to assess?**
 
+{% if detail_level == "executive_brief" %}Provide a summary risk matrix with top 5 risks, their RAG status, and recommended actions only.{% elif detail_level == "comprehensive" %}Perform full qualitative and semi-quantitative assessment with probability/impact scoring, risk interdependencies, and detailed mitigation plans.{% endif %}
+
 Share your risk list, and I'll guide you through a comprehensive qualitative risk assessment and prioritization process.

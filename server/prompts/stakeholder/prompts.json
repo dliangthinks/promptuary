@@ -63,6 +63,11 @@
           "name": "audience",
           "description": "Target audience (e.g., 'executive', 'team', 'sponsor')",
           "required": false
+        },
+        {
+          "name": "detail_level",
+          "description": "Level of detail: executive_brief, standard, or comprehensive",
+          "required": false
         }
       ]
     },

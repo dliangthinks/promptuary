@@ -23,3 +23,7 @@ For each active project identified:
 - Recommended next steps
 
 Organize by priority level and provide a summary of overall project portfolio health. Focus on actionable insights rather than exhaustive details.{% if time_range %} Focus on activity within the following time range: {{time_range}}.{% endif %}
+
+{% if audience_type == "executive" %}Tailor the update for executive stakeholders: focus on strategic alignment, high-level status, key decisions needed, and major risks. Keep each project summary concise.{% elif audience_type == "sponsor" %}Tailor the update for project sponsors: emphasize governance items, budget status, milestone progress, and items requiring sponsor approval or attention.{% elif audience_type == "team" %}Tailor the update for the project team: include detailed task-level progress, blockers, dependencies, and coordination items.{% elif audience_type == "client" %}Tailor the update for client stakeholders: focus on deliverable progress, timeline adherence, and any items requiring client input or decision.{% endif %}
+
+{% if detail_level == "executive_brief" %}Provide a brief executive summary for each project with only RAG status, key highlights, and critical decisions needed. Keep the entire update concise.{% elif detail_level == "comprehensive" %}Provide a comprehensive update for each project including detailed progress, full risk analysis, resource utilization, dependencies, and trend data.{% endif %}

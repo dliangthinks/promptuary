@@ -25,6 +25,16 @@
           "name": "time_range",
           "description": "Optional time range to focus on (e.g., 'last 2 weeks', 'this month')",
           "required": false
+        },
+        {
+          "name": "audience_type",
+          "description": "Report audience: executive, sponsor, team, or client",
+          "required": false
+        },
+        {
+          "name": "detail_level",
+          "description": "Level of detail: executive_brief, standard, or comprehensive",
+          "required": false
         }
       ],
       "onEmptyInvocation": "execute_if_possible"
@@ -39,6 +49,11 @@
         {
           "name": "project_name",
           "description": "Name of the project",
+          "required": false
+        },
+        {
+          "name": "detail_level",
+          "description": "Level of detail: executive_brief, standard, or comprehensive",
           "required": false
         }
       ]
@@ -57,7 +72,13 @@
       "category": "governance",
       "description": "Establish project governance framework including decision-making authority, reporting structure, and oversight mechanisms",
       "file": "governance_framework.md",
-      "arguments": []
+      "arguments": [
+        {
+          "name": "methodology",
+          "description": "Project methodology: predictive, agile, or hybrid",
+          "required": false
+        }
+      ]
     },
     {
       "id": "change_control",

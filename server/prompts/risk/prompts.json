@@ -28,7 +28,13 @@
       "category": "risk",
       "description": "Perform qualitative risk assessment using probability and impact analysis",
       "file": "risk_assessment.md",
-      "arguments": []
+      "arguments": [
+        {
+          "name": "detail_level",
+          "description": "Level of detail: executive_brief, standard, or comprehensive",
+          "required": false
+        }
+      ]
     },
     {
       "id": "risk_response_planning",
@@ -40,6 +46,11 @@
         {
           "name": "risk_description",
           "description": "Description of the risk to plan for",
+          "required": false
+        },
+        {
+          "name": "risk_type",
+          "description": "Type of risk: threat or opportunity",
           "required": false
         }
       ]

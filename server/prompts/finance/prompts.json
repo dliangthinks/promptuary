@@ -47,6 +47,16 @@
           "name": "reporting_period",
           "description": "Reporting period",
           "required": false
+        },
+        {
+          "name": "audience_type",
+          "description": "Report audience: executive, sponsor, team, or client",
+          "required": false
+        },
+        {
+          "name": "detail_level",
+          "description": "Level of detail: executive_brief, standard, or comprehensive",
+          "required": false
         }
       ]
     },

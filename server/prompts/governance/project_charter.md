@@ -51,3 +51,5 @@ I'll guide you through gathering all necessary information to create a complete 
 
 Share the project name or context, and I'll guide you through gathering all necessary information to create a complete project charter document.
 {% endif %}
+
+{% if detail_level == "executive_brief" %}Create a concise 1-2 page charter covering only objectives, scope summary, key milestones, and budget range.{% elif detail_level == "comprehensive" %}Create a full charter including all sections: objectives, scope, stakeholders, risks, assumptions, constraints, milestones, budget, and governance.{% endif %}

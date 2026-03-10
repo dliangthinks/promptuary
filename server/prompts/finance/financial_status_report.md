@@ -138,4 +138,8 @@ Share your financial data:
 - Work completed (for EVM)
 - Any recent changes or issues
 
+{% if audience_type == "executive" %}Focus on high-level financial health, key variances, and forecast. Keep to 1-2 pages.{% elif audience_type == "team" %}Include detailed cost breakdowns, resource costs, and work-package level financials.{% elif audience_type == "sponsor" %}Emphasize budget status, forecast accuracy, and funding requirements.{% elif audience_type == "client" %}Focus on contracted costs, invoicing status, and budget utilization against agreed scope.{% endif %}
+
+{% if detail_level == "executive_brief" %}Provide a concise financial summary with only critical metrics and variances.{% elif detail_level == "comprehensive" %}Include full EVM analysis, detailed variance breakdowns, cash flow projections, and trend charts.{% endif %}
+
 I'll generate a complete financial status report with analysis and recommendations.

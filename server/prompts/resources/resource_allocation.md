@@ -107,6 +107,14 @@ You are an expert in resource management and allocation planning. Follow this st
     - Risk mitigation strategies
     - Resource tracking mechanisms
 
+{% if methodology == "agile" %}
+Allocate resources by cross-functional team composition. Focus on dedicated team members, T-shaped skills, and sustainable pace. Plan capacity by velocity and sprint commitment.
+{% elif methodology == "predictive" %}
+Allocate resources by activity and work package. Use resource leveling and smoothing to resolve over-allocations. Plan based on detailed task assignments and resource calendars.
+{% elif methodology == "hybrid" %}
+Assign dedicated team members to iterative delivery tracks while managing shared resources across phase-gated milestones. Balance sprint capacity planning with activity-based resource needs.
+{% endif %}
+
 Use filesystem tools to create resource allocation documentation with tables and charts.
 
 ## User Message Template
@@ -122,4 +130,14 @@ Share information about this project's activities and available resources, and I
 **What project are you allocating resources for?**
 
 Share information about your project activities and available resources, and I'll guide you through creating an effective resource allocation plan.
+{% endif %}
+
+{% if not methodology %}What project methodology are you using? (predictive/waterfall, agile/scrum, hybrid){% endif %}
+
+{% if methodology == "agile" %}
+Allocate resources by cross-functional team composition. Focus on dedicated team members, T-shaped skills, and sustainable pace. Plan capacity by velocity and sprint commitment.
+{% elif methodology == "predictive" %}
+Allocate resources by activity and work package. Use resource leveling and smoothing to resolve over-allocations. Plan based on detailed task assignments and resource calendars.
+{% elif methodology == "hybrid" %}
+Assign dedicated team members to iterative delivery tracks while managing shared resources across phase-gated milestones. Balance sprint capacity planning with activity-based resource needs.
 {% endif %}

@@ -115,6 +115,14 @@ You are an expert in organizational design and responsibility assignment. Follow
     - Team working agreements
     - Onboarding guide for new team members
 
+{% if methodology == "agile" %}
+Design around cross-functional, self-organizing teams (typically 5-9 members). Define Scrum roles (Product Owner, Scrum Master, Development Team) or Kanban roles. Emphasize collaboration over hierarchy.
+{% elif methodology == "predictive" %}
+Design a hierarchical team structure with clear reporting lines, functional leads, and defined roles per work package. Include a RACI matrix for all major deliverables and decision points.
+{% elif methodology == "hybrid" %}
+Create a matrix structure with functional reporting for governance and cross-functional teams for delivery. Define both traditional PM roles and agile roles where teams operate iteratively.
+{% endif %}
+
 Use filesystem tools to create team structure documentation including visual diagrams and tables.
 
 ## User Message Template
@@ -123,5 +131,15 @@ Use filesystem tools to create team structure documentation including visual dia
 I'll help you design an effective team structure and create a clear RACI matrix that eliminates ambiguity about roles, responsibilities, and decision-making authority.
 
 **What project are you structuring a team for?**
+
+{% if not methodology %}What project methodology are you using? (predictive/waterfall, agile/scrum, hybrid){% endif %}
+
+{% if methodology == "agile" %}
+Design around cross-functional, self-organizing teams (typically 5-9 members). Define Scrum roles (Product Owner, Scrum Master, Development Team) or Kanban roles. Emphasize collaboration over hierarchy.
+{% elif methodology == "predictive" %}
+Design a hierarchical team structure with clear reporting lines, functional leads, and defined roles per work package. Include a RACI matrix for all major deliverables and decision points.
+{% elif methodology == "hybrid" %}
+Create a matrix structure with functional reporting for governance and cross-functional teams for delivery. Define both traditional PM roles and agile roles where teams operate iteratively.
+{% endif %}
 
 Share information about your project and any known team members or roles, and I'll guide you through creating a comprehensive team structure and RACI matrix.
