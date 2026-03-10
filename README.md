@@ -206,14 +206,19 @@ server/prompts/
 
 ### Prompt Format
 
-Prompts are markdown files with Nunjucks templating:
+Prompts are markdown files with a structured layout:
 
-```nunjucks
-Analyze {{content}} for {% if focus_area %}{{focus_area}}{% else %}general{% endif %} insights.
+```markdown
+# Prompt Title
 
-{% for item in items %}
-- {{item}}
-{% endfor %}
+## Description
+What this prompt does
+
+## System Message
+Instructions that shape Claude's behavior for this task
+
+## User Message Template
+The template that gets rendered with arguments and sent to Claude
 ```
 
 Arguments are defined in the category's `prompts.json`:
@@ -222,18 +227,155 @@ Arguments are defined in the category's `prompts.json`:
 {
   "prompts": [
     {
-      "id": "my_prompt",
-      "name": "My Prompt",
-      "category": "my-category",
-      "description": "What this prompt does",
-      "file": "my_prompt.md",
+      "id": "meeting_minutes",
+      "name": "Meetings",
+      "category": "stakeholder",
+      "description": "Document meeting minutes with decisions and action items",
+      "file": "meeting_minutes.md",
       "arguments": [
-        { "name": "content", "description": "The content to analyze", "required": true }
+        { "name": "transcript", "description": "Meeting transcript or notes", "required": true },
+        { "name": "meeting_type", "description": "Type of meeting (kickoff, status, steering committee)", "required": false }
       ]
     }
   ]
 }
 ```
+
+---
+
+## Template Engine
+
+Promptuary uses [Nunjucks](https://mozilla.github.io/nunjucks/) as its template engine. This is what sets it apart from static prompt files or Claude Code skills — prompts are not fixed text, they are rendered templates with logic that adapts based on the arguments Claude passes.
+
+### Why not just use skills or static prompts?
+
+Claude Code skills (slash commands like `/commit`, `/review-pr`) are static text that gets injected into context. They can't take structured arguments, can't conditionally include or exclude sections, and can't adapt their instructions based on what the user needs. Every invocation sends the exact same prompt regardless of context.
+
+Promptuary prompts are templates. They accept arguments, render only the relevant sections, and give Claude focused guidance instead of a wall of generic instructions. The result is more deterministic output — the business logic lives in the template, not in Claude's interpretation.
+
+### Variable substitution
+
+The simplest feature — inject values into the template:
+
+```nunjucks
+Process the following meeting transcript into structured minutes:
+
+Meeting type: {{meeting_type}}
+
+Transcript:
+{{transcript}}
+```
+
+### Conditionals — skip sections when arguments are empty
+
+Without conditionals, omitting `meeting_type` renders a blank line (`Meeting type: `), which wastes tokens and can confuse the model. With conditionals:
+
+```nunjucks
+{% if meeting_type %}
+Meeting type: {{meeting_type}}
+{% endif %}
+
+Transcript:
+{{transcript}}
+```
+
+When `meeting_type` is not provided, the line disappears entirely. Claude gets a cleaner prompt.
+
+### Defaults
+
+Provide fallback values for optional arguments:
+
+```nunjucks
+Audience: {{audience or "executive stakeholders"}}
+```
+
+### Audience-aware rendering — show only what's relevant
+
+This is where templates get powerful. The stakeholder status report prompt has guidance for 5 different audience types. Without conditionals, Claude always sees all 5 — executives, steering committee, team, business owners, end users — even when the report is for one specific audience.
+
+With conditional rendering, only the relevant guidance is included:
+
+```nunjucks
+{% if not audience or audience == "executive" %}
+**Executive Stakeholders:**
+- Focus: Strategic alignment, ROI, major risks
+- Length: 1-2 pages maximum
+- Format: High-level summary, exception-based reporting
+- Avoid: Technical details, operational minutiae
+{% endif %}
+
+{% if not audience or audience == "team" %}
+**Project Team:**
+- Focus: Tasks, assignments, obstacles, coordination
+- Length: Detailed, comprehensive
+- Format: Work-package level detail
+{% endif %}
+```
+
+When `audience="executive"`, Claude only sees the executive guidance. When `audience` is omitted, all sections render (backward compatible). This makes the output more deterministic — Claude follows focused instructions rather than choosing from a menu of options.
+
+### Method-specific rendering
+
+The cost estimation prompt has detailed sections for bottom-up, top-down, and parametric methods. When the user specifies a method, only that method's process is rendered:
+
+```nunjucks
+{% if not estimation_method or estimation_method == "bottom-up" %}
+2. BOTTOM-UP ESTIMATING: Most accurate, most time-intensive:
+   - Estimate cost of individual work packages
+   - Sum work package costs to get totals
+   - Roll up through WBS hierarchy
+   ...
+{% endif %}
+
+{% if not estimation_method or estimation_method == "parametric" %}
+4. PARAMETRIC ESTIMATING: Uses statistical relationships:
+   - Use cost per unit metrics
+   - Multiply by quantity
+   ...
+{% endif %}
+```
+
+### Meeting-type-specific emphasis
+
+The same output structure adapts its priorities based on what kind of meeting it was:
+
+```nunjucks
+{% if meeting_type == "kickoff" %}
+Emphasize project objectives, scope agreements, role assignments, and ground rules.
+{% elif meeting_type == "steering committee" %}
+Emphasize governance decisions, approvals granted, and escalated issues.
+Decisions Made should be the most detailed section.
+{% elif meeting_type == "retrospective" %}
+Emphasize what went well, what didn't, and improvement actions.
+Reframe Action Items as improvement commitments with owners.
+{% endif %}
+```
+
+### Methodology branching
+
+Prompts that span project management approaches adapt their language and structure:
+
+```nunjucks
+{% if methodology == "agile" %}
+Focus on iteration/sprint-based scheduling with rolling wave planning.
+Use story points for estimation and velocity for forecasting.
+{% elif methodology == "predictive" %}
+Create a detailed schedule with WBS-based activities, firm dependencies,
+and critical path analysis.
+{% elif methodology == "hybrid" %}
+Combine phase-gated milestones with iterative delivery within phases.
+{% endif %}
+```
+
+### How arguments get passed
+
+You don't need to construct the arguments yourself. When you say "take minutes from this standup," Claude sees the prompt's argument definitions, extracts the relevant values from the conversation, and calls `execute_prompt` with structured arguments:
+
+```
+>>meeting_minutes {"meeting_type": "standup", "transcript": "..."}
+```
+
+The template engine renders the prompt with those values, and Claude receives focused, relevant instructions.
 
 ---
 
