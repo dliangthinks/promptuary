@@ -61,7 +61,6 @@ This is a **Model Context Protocol (MCP) server** that provides AI prompt manage
 - `delete_prompt` — Deletes prompt by ID (arg is `{ id }`, NOT `{ name }`).
 - `move_prompt` — Moves prompt between categories. Auto-cleans empty source category.
 - `delete_category` — Deletes empty category. Errors if prompts still exist.
-- `modify_prompt_section` — Modifies a specific section of a prompt.
 - `reload_prompts` — Hot-reloads prompts or triggers full server restart.
 
 **App entry tool:**

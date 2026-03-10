@@ -69,7 +69,6 @@ Promptuary gives you two interfaces to work with. Some things can only be done i
 | Reload prompts from disk | Y (reload button) | `reload_prompts` |
 | View execution analytics | - | `execution_analytics` |
 | Read raw prompt markdown | - | `read_prompt` |
-| Modify a specific section | - | `modify_prompt_section` |
 
 ---
 
@@ -141,7 +140,6 @@ These tools are available to Claude (or any MCP client) during conversation.
 | `update_prompt` | Update name, description, or content of an existing prompt |
 | `delete_prompt` | Delete a prompt by ID |
 | `read_prompt` | Read raw markdown content (no rendering) |
-| `modify_prompt_section` | Edit a specific section of a prompt |
 | `move_prompt` | Move a prompt from one category to another |
 
 ### Managing Categories
@@ -400,9 +398,9 @@ npm run start:verbose    # Verbose logging
 
 ---
 
-## Packaging as DXT
+## Packaging as MCPB
 
-To distribute Promptuary as an installable MCP package (`.dxt`):
+To distribute Promptuary as an installable MCP package (`.mcpb`):
 
 ```bash
 # 1. Install the MCP build tool (one-time)
