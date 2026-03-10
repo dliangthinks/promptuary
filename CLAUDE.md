@@ -52,7 +52,6 @@ This is a **Model Context Protocol (MCP) server** that provides AI prompt manage
 - `execute_prompt` — Renders prompt template with Nunjucks variable substitution
 - `listprompts` — Lists all available prompts (ONE WORD, not `list_prompts`)
 - `process_slash_command` — DEPRECATED alias for `execute_prompt`
-- `execution_analytics` — View execution metrics
 
 **Prompt management tools** (used by both Claude and the MCP App UI):
 - `read_prompt` — Reads raw .md file (no rendering). Used by App for editing.

@@ -67,7 +67,6 @@ Promptuary gives you two interfaces to work with. Some things can only be done i
 | Create / rename / delete categories | Y (right-click) | `create_category`, `rename_category`, `delete_category` |
 | Search / filter prompts | Y (search bar) | - |
 | Reload prompts from disk | Y (reload button) | `reload_prompts` |
-| View execution analytics | - | `execution_analytics` |
 | Read raw prompt markdown | - | `read_prompt` |
 
 ---
@@ -122,7 +121,6 @@ These tools are available to Claude (or any MCP client) during conversation.
 |---|---|
 | `listprompts` | List all available prompts with their IDs, categories, and descriptions |
 | `execute_prompt` | Render and execute a prompt template with argument substitution |
-| `execution_analytics` | View execution metrics and detection accuracy |
 
 ```
 # List everything available
