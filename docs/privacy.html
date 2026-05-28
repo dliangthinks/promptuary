@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Promptuary Privacy Policy</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           max-width: 720px; margin: 2.5rem auto; padding: 0 1.25rem;
+           line-height: 1.55; color: #222; }
+    h1 { margin-bottom: 0.25rem; }
+    h2 { margin-top: 1.75rem; }
+    code { background: #f4f4f4; padding: 0.1rem 0.35rem; border-radius: 3px; }
+    .updated { color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+<h1>Promptuary Privacy Policy</h1>
+<p class="updated">Last updated: May 28, 2026</p>
+
+<h2>Overview</h2>
+<p>Promptuary is a local Model Context Protocol (MCP) server that runs entirely
+on your device. It reads and writes prompt template files (markdown) on your
+local filesystem and exposes them to MCP clients such as Claude Desktop.</p>
+
+<h2>Data Collection</h2>
+<p>Promptuary does not collect, transmit, or share any personal data. It does
+not make outbound network requests to any author-controlled service, has no
+analytics, and has no telemetry.</p>
+
+<h2>Data Usage and Storage</h2>
+<p>All prompt content stays on your device under the directory you choose (by
+default <code>server/prompts/</code>). Promptuary reads and writes only to that
+directory. Any data sent to an MCP client (e.g. Claude Desktop) is governed by
+that client's privacy policy, not this one.</p>
+
+<h2>Third-Party Sharing</h2>
+<p>None. Promptuary does not share data with third parties.</p>
+
+<h2>Data Retention</h2>
+<p>Prompt files persist on your local filesystem until you delete them. There
+is no server-side retention because there is no server other than the one
+running locally.</p>
+
+<h2>Browser Viewer</h2>
+<p>When enabled, Promptuary binds an HTTP server to
+<code>localhost:9090</code> so you can manage prompts in a browser tab on the
+same machine. The server accepts connections only from localhost.</p>
+
+<h2>Contact</h2>
+<p>Questions:
+<a href="mailto:liangdong2046@gmail.com">liangdong2046@gmail.com</a>
+or open an issue at
+<a href="https://github.com/dliangthinks/promptuary/issues">github.com/dliangthinks/promptuary/issues</a>.</p>
+</body>
+</html>

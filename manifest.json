@@ -1,15 +1,36 @@
 {
-  "dxt_version": "0.1",
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
   "name": "promptuary",
   "display_name": "Promptuary",
-  "version": "2.0.0",
-  "description": "Interactive prompt management system",
+  "version": "2.0.3",
+  "description": "Interactive prompt template library with hot-reload and an in-conversation UI",
+  "long_description": "Promptuary is a local prompt library that lives where you already work. Store reusable prompt templates as markdown files organized into categories, render them with Nunjucks variable substitution and conditionals, and manage everything through an interactive UI that opens inside Claude Desktop. Prompts hot-reload from disk, so edits are live without restarting. Includes drag-and-drop category management, inline rename, search, and a browser viewer at localhost:9090 for managing prompts alongside conversations.",
   "author": {
-    "name": "Dong Liang"  
-   },
+    "name": "Dong Liang",
+    "email": "liangdong2046@gmail.com",
+    "url": "https://dliangthinks.me"
+  },
   "icon": "icon.png",
   "homepage": "https://dliangthinks.me",
-  
+  "documentation": "https://github.com/dliangthinks/promptuary#readme",
+  "support": "https://github.com/dliangthinks/promptuary/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dliangthinks/promptuary"
+  },
+  "license": "MIT",
+  "keywords": [
+    "prompt",
+    "template",
+    "nunjucks",
+    "library",
+    "mcp-app",
+    "prompt-engineering"
+  ],
+  "privacy_policies": [
+    "https://dliangthinks.github.io/promptuary/privacy.html"
+  ],
   "server": {
     "type": "node",
     "entry_point": "server/dist/index.js",
@@ -18,8 +39,6 @@
       "args": [
         "${__dirname}/server/dist/index.js"
       ]
-  
     }
   }
-
 }

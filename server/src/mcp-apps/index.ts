@@ -31,6 +31,7 @@ export function registerMcpApps(
       description:
         "Opens the Promptuary prompt management UI. Browse, execute, edit, and delete prompts via an interactive icon grid interface.",
       inputSchema: {},
+      annotations: { readOnlyHint: true },
       _meta: { ui: { resourceUri } },
     },
     async (): Promise<CallToolResult> => {
@@ -39,7 +40,7 @@ export function registerMcpApps(
         content: [
           {
             type: "text",
-            text: "Promptuary Prompt Manager is ready. Use the interactive UI to browse and manage your prompts. If you are in a non-UI host, use the individual tools: list_prompts, execute_prompt, update_prompt, delete_prompt, create_category, delete_category, reload_prompts.",
+            text: "Promptuary Prompt Manager is ready. Use the interactive UI to browse and manage your prompts. If you are in a non-UI host, use the individual tools: listprompts, execute_prompt, update_prompt, delete_prompt, create_category, delete_category, reload_prompts.",
           },
         ],
       };

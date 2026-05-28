@@ -56,3 +56,6 @@ report.*.json
 #Temporary test files
 server/test-server.js
 server/test-listprompts.mjs
+
+# Build artifacts
+promptuary.mcpb

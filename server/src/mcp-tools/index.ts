@@ -105,6 +105,7 @@ export class McpToolsManager {
             ">>prompt_name your_content_here | For multiple arguments use JSON format: >>prompt_name {\"arg1\": \"value1\", \"arg2\": \"value2\"}"
           ),
       },
+      { title: "Execute Prompt" },
       async ({ command }: { command: string }, extra: any) => {
         try {
           this.logger.info(`Executing prompt command: ${command}`);
@@ -402,6 +403,7 @@ export class McpToolsManager {
           .optional()
           .describe("Optional filter text to show only matching commands"),
       },
+      { title: "List Prompts", readOnlyHint: true },
       async ({ command }: { command?: string }, extra: any) => {
         try {
           const match = command

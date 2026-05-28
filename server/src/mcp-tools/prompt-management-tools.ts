@@ -54,6 +54,24 @@ export class PromptManagementTools {
   }
 
   /**
+   * Ensure the prompt markdown contains a `## User Message Template` section.
+   * The loader requires this section; without it the converter silently drops
+   * the prompt. If missing, wrap the caller-provided content so it becomes the
+   * template body, producing a valid prompt file.
+   */
+  private ensureUserMessageTemplate(
+    content: string,
+    name: string,
+    description?: string
+  ): string {
+    if (/^##\s+User Message Template\s*$/m.test(content)) {
+      return content;
+    }
+    const header = `# ${name}\n\n## Description\n${description || name}\n\n## User Message Template\n`;
+    return header + content.trimStart();
+  }
+
+  /**
    * Register read_prompt tool — returns raw .md file content
    */
   registerReadPrompt(): void {
@@ -63,6 +81,7 @@ export class PromptManagementTools {
       {
         id: z.string().describe("Prompt ID or name from listprompts output"),
       },
+      { title: "Read Prompt", readOnlyHint: true },
       async ({ id }: { id: string }, extra: any) => {
         try {
           const PROMPTS_FILE = this.configManager.getPromptsFilePath();
@@ -113,7 +132,7 @@ export class PromptManagementTools {
   registerCreatePrompt(): void {
     this.mcpServer.tool(
       "create_prompt",
-      "Create a new prompt in an existing category. IMPORTANT: Call listprompts first to see existing categories. Category must already exist — this tool does not auto-create categories.",
+      "Create a new prompt in an existing category. IMPORTANT: Call listprompts first to see existing categories. Category must already exist — this tool does not auto-create categories. The `content` should include a `## User Message Template` section (Nunjucks-compatible); if omitted, the provided content is automatically wrapped as the template body.",
       {
         name: z.string().describe("Display name for the prompt"),
         category: z.string().describe("Category this prompt belongs to (must be an existing category)"),
@@ -126,6 +145,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after creating the prompt. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Create Prompt" },
       async (
         args: {
           name: string;
@@ -245,10 +265,18 @@ export class PromptManagementTools {
       );
     }
 
-    // Write the .md file
+    // Write the .md file. Auto-wrap content if the required
+    // `## User Message Template` section is missing; without it the loader
+    // throws and the converter silently drops the prompt, so the UI/listprompts
+    // would never show it.
     const promptFilename = `${id}.md`;
     const fullPromptFilePath = path.join(promptDirPath, promptFilename);
-    await safeWriteFile(fullPromptFilePath, args.content, "utf8");
+    const normalizedContent = this.ensureUserMessageTemplate(
+      args.content,
+      args.name,
+      args.description
+    );
+    await safeWriteFile(fullPromptFilePath, normalizedContent, "utf8");
 
     // Add entry to category's prompts.json
     const promptEntry: PromptData = {
@@ -294,6 +322,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after updating the prompt. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Update Prompt" },
       async (
         args: {
           name: string;
@@ -414,7 +443,12 @@ export class PromptManagementTools {
     // Update content if provided
     if (args.content) {
       const fullPromptFilePath = path.join(promptDirPath, foundPrompt.file);
-      await safeWriteFile(fullPromptFilePath, args.content, "utf8");
+      const normalizedContent = this.ensureUserMessageTemplate(
+        args.content,
+        args.new_name || foundPrompt.name,
+        args.description || foundPrompt.description
+      );
+      await safeWriteFile(fullPromptFilePath, normalizedContent, "utf8");
       messages.push(`✅ Updated prompt markdown file: ${foundPrompt.file}`);
     }
 
@@ -535,6 +569,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after deleting the prompt. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Delete Prompt", destructiveHint: true },
       async (
         { id, fullServerRestart }: { id: string; fullServerRestart?: boolean },
         extra: any
@@ -803,6 +838,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after creating. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Create Category" },
       async (
         { name, after, fullServerRestart }: { name: string; after?: string; fullServerRestart?: boolean },
         extra: any
@@ -948,6 +984,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after deleting the category. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Delete Category", destructiveHint: true },
       async (
         { name, fullServerRestart }: { name: string; fullServerRestart?: boolean },
         extra: any
@@ -1102,6 +1139,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after renaming. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Rename Category" },
       async (
         { name, new_name, fullServerRestart }: { name: string; new_name: string; fullServerRestart?: boolean },
         extra: any
@@ -1286,6 +1324,7 @@ export class PromptManagementTools {
             "Whether to perform a full server restart after moving the prompt. Defaults to false (hot-reload only)."
           ),
       },
+      { title: "Move Prompt" },
       async (
         { id, target_category, fullServerRestart }: { id: string; target_category: string; fullServerRestart?: boolean },
         extra: any
@@ -1458,6 +1497,7 @@ export class PromptManagementTools {
           .optional()
           .describe("Optional reason for reloading/restarting"),
       },
+      { title: "Reload Prompts" },
       async (
         {
           fullServerRestart,

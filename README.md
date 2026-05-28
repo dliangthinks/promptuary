@@ -439,6 +439,12 @@ mcpb pack
 
 ---
 
+## Privacy Policy
+
+Promptuary runs entirely on your local machine. It does not collect, transmit, or share any data — no analytics, no telemetry, no outbound network requests to author-controlled services. Prompt files stay on your filesystem; the browser viewer binds only to `localhost:9090`. Full policy: [https://dliangthinks.github.io/promptuary/privacy.html](https://dliangthinks.github.io/promptuary/privacy.html).
+
+---
+
 ## License
 
 Released under the [MIT License](LICENSE).
