@@ -79,6 +79,19 @@ export function usePromptData(app: App | null, restMode: boolean = false) {
     loadPrompts();
   }, [loadPrompts]);
 
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") loadPrompts();
+    };
+    const onFocus = () => loadPrompts();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [loadPrompts]);
+
   const filteredPrompts = prompts.filter((p) => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();

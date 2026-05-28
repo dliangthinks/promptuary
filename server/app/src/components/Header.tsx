@@ -28,7 +28,12 @@ export function Header({
   return (
     <header className="header">
       <div className="header-top">
-        <h1 className="header-title">Promptuary</h1>
+        <h1 className="header-title">
+          Promptuary
+          <span style={{ fontSize: "0.6em", opacity: 0.6, marginLeft: "0.5em", fontWeight: "normal" }}>
+            v2.0.3
+          </span>
+        </h1>
         <div className="header-actions">
           <button
             className="btn btn-icon"

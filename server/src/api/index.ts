@@ -6,6 +6,7 @@
 import express, { Request, Response } from "express";
 import { mkdir, readFile, rm, stat } from "fs/promises";
 import path from "path";
+import { fileURLToPath } from "url";
 import { ConfigManager } from "../config/index.js";
 import { Logger } from "../logging/index.js";
 import { McpToolsManager } from "../mcp-tools/index.js";
@@ -1111,8 +1112,12 @@ Replace this section with the content you want to send to the assistant. Use {{p
    * Resolve path to the MCP App's bundled HTML file
    */
   private getAppHtmlPath(): string {
-    // When running from dist/, go up to server root, then into app/dist/
-    const currentDir = path.dirname(new URL(import.meta.url).pathname);
+    // When running from dist/, go up to server root, then into app/dist/.
+    // Use fileURLToPath rather than URL.pathname: the latter percent-encodes
+    // spaces (e.g. "~/Library/Application Support/Claude/Claude Extensions"
+    // becomes ".../Application%20Support/Claude%20Extensions/..."), which
+    // then fails readFile with ENOENT.
+    const currentDir = path.dirname(fileURLToPath(import.meta.url));
     return path.resolve(currentDir, "..", "..", "app", "dist", "index.html");
   }
 
