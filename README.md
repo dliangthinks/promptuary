@@ -6,7 +6,9 @@
 
 An MCP server for managing and executing AI prompt templates. Includes a built-in UI that renders inside Claude Desktop and other MCP hosts.
 
-[Quick Start](#quick-start) | [UI Guide](#prompt-manager-ui) | [Chat Tools](#chat-tools) | [Configuration](#configuration)
+[![Download .mcpb](https://img.shields.io/github/v/release/dliangthinks/promptuary?label=Download&sort=semver)](https://github.com/dliangthinks/promptuary/releases/latest)
+
+[Quick Start](#quick-start) | [UI Guide](#prompt-manager-ui) | [Chat Tools](#chat-tools) | [Configuration](#configuration) | [Download](https://github.com/dliangthinks/promptuary/releases/latest)
 
 ---
 
@@ -23,6 +25,10 @@ If you use AI daily, you've built up prompts that work — for code reviews, wri
 Promptuary is a prompt library that lives where you already work. It runs as an MCP server inside Claude Desktop, so your prompts are always one tool call away — browsable, searchable, executable with argument substitution, and editable without leaving the conversation.
 
 ## Quick Start
+
+**Fastest path:** download the latest `promptuary.mcpb` from the [Releases page](https://github.com/dliangthinks/promptuary/releases/latest) and drag it into Claude Desktop's Settings → Extensions. No build step required.
+
+**From source:**
 
 ```bash
 git clone https://github.com/dliangthinks/promptuary.git
