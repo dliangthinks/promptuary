@@ -445,6 +445,12 @@ Promptuary runs entirely on your local machine. It does not collect, transmit, o
 
 ---
 
+## Credits
+
+Promptuary is a fork of [minipuft/claude-prompts](https://github.com/minipuft/claude-prompts) (AGPL-3.0). The original codebase provided the MCP server scaffolding, prompt registry, template processor, and transport layer. This fork adds an interactive MCP App UI (React), a dual-mode browser viewer with REST API, and a simplified core focused on prompt library management — removing the original's gate validation, semantic analysis, and framework subsystems.
+
 ## License
 
-Released under the [MIT License](LICENSE).
+Released under the [GNU Affero General Public License v3.0 or later](LICENSE).
+
+Because Promptuary derives from an AGPL-3.0 project, it is also AGPL-3.0. This is copyleft: anyone distributing a modified version, or hosting a modified version as a network service, must share their changes under the same license. See the LICENSE file for the full terms.

@@ -19,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/dliangthinks/promptuary"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "keywords": [
     "prompt",
     "template",

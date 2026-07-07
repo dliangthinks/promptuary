@@ -285,7 +285,7 @@ We appreciate all contributions to the project! Contributors will be:
 
 ## License
 
-By contributing to this project, you agree that your contributions will be licensed under the project's MIT License.
+By contributing to this project, you agree that your contributions will be licensed under the project's GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).
 
 ---
 
