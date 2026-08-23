@@ -203,6 +203,17 @@ server/prompts/
 - `viewer.autoStart: true` in config.json makes STDIO mode also bind HTTP port — if the port is taken (e.g. a second instance spawned for Cowork/Code sessions), the viewer is skipped with a warning and STDIO continues (fixed in 2.0.4; earlier versions crashed)
 - CSS must use `height: auto` (not `100vh`) and no `max-width` constraints — host iframe determines size
 
+### Claude Code Plugin Distribution
+
+The repo doubles as a Claude Code plugin (referenced from the dliangthinks/superpower marketplace via GitHub source).
+
+- `.claude-plugin/plugin.json` + `.mcp.json` at repo root register the MCP server via `${CLAUDE_PLUGIN_ROOT}/server/dist/index.js`
+- `server/dist/` and `server/app/dist/` are COMMITTED — plugin installs run no build steps, so after changing source, rebuild AND commit dist
+- Root `package.json`/`package-lock.json` hold the server's runtime deps; Claude Code runs `npm ci --ignore-scripts` at the plugin root on install, and `server/dist` resolves packages by walking up. Keep the root dependency list in sync with `server/package.json`
+- `PROMPTUARY_HOME` env var (set to `~/.promptuary` in `.mcp.json`) routes the prompt library to a stable directory, seeded from bundled defaults on first run — plugin cache updates never wipe user prompts. Implemented in `server/src/bootstrap/home.ts` by setting `MCP_PROMPTS_CONFIG_PATH`, which still wins if set explicitly
+- `.mcpbignore` plugin exclusions are root-anchored (`/node_modules/`, `/package.json`, ...) — bare patterns would strip `server/node_modules` and `server/package.json` from the mcpb and break it
+- MCP Apps (`ui://`, the prompt_manager UI) do NOT render in Claude Code CLI — plugin users get the tools and the localhost:9090 browser viewer only
+
 ### Key Development Guidelines
 
 #### Configuration Management
