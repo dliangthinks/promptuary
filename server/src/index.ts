@@ -3,6 +3,7 @@
  * Minimal entry point with comprehensive error handling
  */
 
+import { bootstrapPromptuaryHome } from "./bootstrap/home.js";
 import { Logger } from "./logging/index.js";
 import { startApplication } from "./orchestration/index.js";
 
@@ -187,6 +188,8 @@ OPTIONS:
 ENVIRONMENT VARIABLES:
   MCP_SERVER_ROOT              Override server root directory detection (recommended)
   MCP_PROMPTS_CONFIG_PATH      Direct path to prompts configuration file
+  PROMPTUARY_HOME              Directory for the prompt library (seeded from the
+                               bundled defaults on first run; survives updates)
 
 OPTIMIZED STARTUP MODES:
   Production:    node dist/index.js --quiet --transport=stdio
@@ -278,6 +281,10 @@ async function main(): Promise<void> {
 
     // Use stderr for startup message to avoid interfering with stdio transport
     console.error("Starting Promptuary...");
+
+    // Route prompt loading to PROMPTUARY_HOME (seeding it on first run)
+    // before anything resolves prompt paths
+    bootstrapPromptuaryHome();
 
     // Initialize the application using the orchestrator
     orchestrator = await startApplication();

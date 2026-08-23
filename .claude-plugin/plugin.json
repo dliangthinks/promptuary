@@ -1,0 +1,11 @@
+{
+  "name": "promptuary",
+  "description": "Prompt template library MCP server. Store reusable Nunjucks prompt templates as markdown organized by category, render them with variable substitution via execute_prompt, and manage the library with create/update/move/delete tools or the browser viewer at localhost:9090. The prompt library lives in ~/.promptuary (seeded on first run) and survives plugin updates.",
+  "version": "2.1.0",
+  "author": {
+    "name": "Dong Liang",
+    "email": "dliangthinks@gmail.com"
+  },
+  "homepage": "https://github.com/dliangthinks/promptuary",
+  "license": "AGPL-3.0-or-later"
+}

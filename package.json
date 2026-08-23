@@ -1,0 +1,16 @@
+{
+  "name": "promptuary-plugin",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Runtime dependencies for the Promptuary Claude Code plugin. Claude Code runs `npm ci` against this file at plugin install time; server/dist resolves these packages by walking up from server/. Keep the dependency list in sync with server/package.json.",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.2.0",
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@types/nunjucks": "^3.2.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "nunjucks": "^3.2.4",
+    "zod": "^3.22.4"
+  }
+}

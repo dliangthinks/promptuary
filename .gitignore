@@ -1,16 +1,15 @@
 # Dependencies
+node_modules/
 server/node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
 
-# Build output
-server/dist/
-server/app/dist/
+# Build output (server/dist and server/app/dist are COMMITTED for the
+# Claude Code plugin, which cannot run build steps at install time)
 server/app/node_modules/
 build/
 out/
-server/package-lock.json
 
 # Environment variables
 server/.env

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "promptuary": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/server/dist/index.js",
+        "--quiet",
+        "--transport=stdio"
+      ],
+      "env": {
+        "PROMPTUARY_HOME": "~/.promptuary"
+      }
+    }
+  }
+}

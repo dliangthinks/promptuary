@@ -24,3 +24,12 @@ server/test-server.js
 server/test-listprompts.mjs
 *.dmp
 *.log
+
+# Plugin-only files (Claude Code plugin distribution, not needed in the mcpb).
+# Patterns are root-anchored: server/node_modules and server/package.json
+# MUST stay in the mcpb (runtime deps + "type": "module").
+/node_modules/
+/package.json
+/package-lock.json
+/.mcp.json
+/.claude-plugin/
