@@ -200,7 +200,7 @@ server/prompts/
 - `update_prompt` has NO category parameter — use `move_prompt` to change category
 - App dist path from compiled `dist/mcp-apps/`: resolve `../..` then `app/dist/`
 - MCP SDK 1.27.1+: do NOT pass `capabilities` to `McpServer` constructor
-- `viewer.autoStart: true` in config.json makes STDIO mode also bind HTTP port — will crash if port is in use
+- `viewer.autoStart: true` in config.json makes STDIO mode also bind HTTP port — if the port is taken (e.g. a second instance spawned for Cowork/Code sessions), the viewer is skipped with a warning and STDIO continues (fixed in 2.0.4; earlier versions crashed)
 - CSS must use `height: auto` (not `100vh`) and no `max-width` constraints — host iframe determines size
 
 ### Key Development Guidelines

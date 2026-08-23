@@ -102,9 +102,6 @@ export class ServerManager {
     // Create HTTP server
     this.httpServer = createServer(app);
 
-    // Setup HTTP server event handlers
-    this.setupHttpServerEventHandlers();
-
     // Start listening
     await new Promise<void>((resolve, reject) => {
       this.httpServer!.listen(this.port, "127.0.0.1", () => {
@@ -117,7 +114,7 @@ export class ServerManager {
         resolve();
       });
 
-      this.httpServer!.on("error", (error: any) => {
+      this.httpServer!.once("error", (error: any) => {
         if (error.code === "EADDRINUSE") {
           this.logger.error(
             `Port ${this.port} is already in use. Set a different port in config.json or use the PORT environment variable.`
@@ -128,6 +125,10 @@ export class ServerManager {
         reject(error);
       });
     });
+
+    // Attach runtime handlers only after a successful listen, so startup
+    // errors reject the promise above instead of hard-exiting the process
+    this.setupHttpServerEventHandlers();
   }
 
   /**
@@ -145,9 +146,12 @@ export class ServerManager {
 
     const app = this.apiManager.createApp();
     this.httpServer = createServer(app);
-    this.setupHttpServerEventHandlers();
 
-    await new Promise<void>((resolve, reject) => {
+    // The viewer is optional in STDIO mode: never attach the exiting error
+    // handler here, and treat every startup failure as non-fatal. A second
+    // server instance (e.g. spawned for Cowork/Code sessions) must survive
+    // the port already being held by the first one.
+    await new Promise<void>((resolve) => {
       this.httpServer!.listen(this.port, "127.0.0.1", () => {
         this.logger.info(
           `Promptuary viewer available at http://localhost:${this.port}/viewer`
@@ -158,19 +162,27 @@ export class ServerManager {
         resolve();
       });
 
-      this.httpServer!.on("error", (error: any) => {
+      this.httpServer!.once("error", (error: any) => {
         if (error.code === "EADDRINUSE") {
           this.logger.warn(
             `Port ${this.port} is already in use. Viewer HTTP server will not be started. STDIO transport will continue normally.`
           );
-          this.httpServer = undefined;
-          resolve(); // Don't crash — viewer is optional in STDIO mode
         } else {
-          this.logger.error("Viewer server error:", error);
-          reject(error);
+          this.logger.warn(
+            "Viewer HTTP server failed to start. STDIO transport will continue normally.",
+            error
+          );
         }
+        this.httpServer = undefined;
+        resolve();
       });
     });
+
+    if (this.httpServer) {
+      this.httpServer.on("close", () => {
+        this.logger.info("HTTP server closed");
+      });
+    }
   }
 
   /**
